@@ -1,0 +1,44 @@
+
+1、在Activity中覆盖onCreateOptionsMenu方法
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // TODO Auto-generated method stub
+        menu.add(0, 1, 1, "苹果");
+        menu.add(0, 2, 2, "香蕉");
+        return super.onCreateOptionsMenu(menu);
+    }
+
+2、这样就有了两个菜单选项。如果要添加点击事件，则要覆盖onOptionsItemSelected(MenuItem item)方法。
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // TODO Auto-generated method stub
+        if(item.getItemId() == 1){
+            Toast t = Toast.makeText(this, "你选的是苹果", Toast.LENGTH_SHORT);
+            t.show();
+        }
+        else if(item.getItemId() == 2){
+            Toast t = Toast.makeText(this, "你选的是香蕉", Toast.LENGTH_SHORT);
+            t.show();
+        } 
+        return true;
+    }
+
+
+3、增加SubMenu，在第一段代码onCreateOptionsMenu(Menu menu)方法中加入几句，成下面这样：
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // TODO Auto-generated method stub
+        menu.add(0, 1, 1, "苹果");
+        menu.add(0, 2, 2, "香蕉");
+        SubMenu subMenu = menu.addSubMenu(1, 100, 100, "桃子");
+        subMenu.add(2, 101, 101, "大桃子");
+        subMenu.add(2, 102, 102, "小桃子");
+        return true;
+    }
+点击“桃子”后就会出现子菜单，有两个子选项，分别是“大桃子”和“小桃子”。
+
+
+
+

@@ -1,0 +1,69 @@
+ 
+枚举的作用：
+
+       一些程序在运行时，它需要的数据不能使任意的，而必须是一定范围内的值，JDK5以前采用自定义类来解决，JDK5以后可以直接采用枚举来解决。
+
+JDK5 以前使用自定义类的代码：
+
+[java] view plaincopy
+package com.feng.myemu;  
+  
+public class Demo1 {  
+    public void test(){  
+        print(Grade.B);  
+    }  
+      
+    public void print(Grade g){  
+          
+    }  
+}  
+class Grade{  
+    private Grade(){}  
+    public static final Grade A = new Grade();  
+    public static final Grade B = new Grade();  
+    public static final Grade C = new Grade();  
+    public static final Grade D = new Grade();  
+    public static final Grade E = new Grade();  
+}  
+
+采用枚举的代码：
+[java] view plaincopy
+package com.feng.myemu;  
+  
+public class Demo1 {  
+    public void test(){  
+        print(Grade.B);  
+    }  
+      
+    public void print(Grade g){  
+          
+    }  
+}  
+  
+enum  Grade{//class  
+    A,B,C,D,E;//Object  
+}  
+
+在关键字enum后的名字相当于自定义的类名，而在花括号中的内容，相当于用那个类在类内部new出来的对象
+
+
+--------------------------------------------
+
+public class EnumTest {  
+    public static void main(String[] args) {  
+        WeekDay weekday =WeekDay.FRI;  
+        System.out.println(weekday);  
+        System.out.println(weekday.name());  
+        System.out.println(weekday.ordinal());  
+        System.out.println(weekday.valueOf("SUN"));  
+        System.out.println(weekday.values().length);  
+    }  
+    public enum WeekDay{  
+        SUN,MON,TUE,WED,THI,FRI,SAT;  
+    }  
+}  
+上面用到几个常用的静态方法。比如Name,和toString相同。
+
+而valueof用于把一个字符串转换为一个枚举元素，这在WEB开发中非常有用。因为浏览器传给服务器的都是字符串。
+
+如果想遍历枚举，就要使用values方法。会返回一个数组。

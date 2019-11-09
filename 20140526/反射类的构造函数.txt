@@ -1,0 +1,91 @@
+ 反射类的构造函数
+分类： java基础 2013-02-23 22:25 358人阅读 评论(0) 收藏 举报
+Person.java
+
+[java] view plaincopy
+package com.feng.reflect;  
+  
+import java.util.List;  
+  
+public class Person {  
+    public String name="aaa";  
+    public Person(){  
+        System.out.println("person");  
+    }  
+      
+    public Person(String name){  
+        System.out.println(name);  
+    }  
+      
+    public Person(String name,int password){  
+        System.out.println(name+":" +password);  
+    }  
+      
+    private Person(List list){  
+        System.out.println("list");  
+    }  
+}  
+
+Demo.java
+[java] view plaincopy
+package com.feng.reflect;  
+  
+import java.awt.List;  
+import java.lang.reflect.Constructor;  
+import java.lang.reflect.InvocationTargetException;  
+import java.util.ArrayList;  
+  
+import org.junit.Test;  
+  
+//反射类的构造函数，创建类的对象  
+public class Demo2 {  
+      
+    //反射类的构造函数:public person()  
+    @Test  
+    public void test1() throws ClassNotFoundException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException{  
+        Class clazz = Class.forName("com.feng.reflect.Person");  
+        Constructor c = clazz.getConstructor(null);  
+          
+        Person person = (Person)c.newInstance(null);  
+        System.out.println(person.name);  
+    }  
+      
+    //反射类构造函数：public person(String name)  
+    @Test  
+    public void test2()throws Exception{  
+        Class clazz = Class.forName("com.feng.reflect.Person");  
+        Constructor c = clazz.getConstructor(String.class);  
+        Person p = (Person) c.newInstance("xxx");  
+        System.out.println(p.name);  
+    }  
+      
+    //反射类构造函数：public person(String name,int password)  
+    @Test  
+    public void test3()throws Exception{  
+        Class clazz = Class.forName("com.feng.reflect.Person");  
+        Constructor c = clazz.getConstructor(String.class,int.class);  
+        Person p = (Person)c.newInstance("xxx",12);  
+        System.out.println(p.name);  
+    }  
+      
+    //private Person(List list)  
+    @Test  
+    public void test4()throws Exception{  
+        Class clazz = Class.forName("com.feng.reflect.Person");  
+        Constructor c = clazz.getDeclaredConstructor(List.class);  
+        c.setAccessible(true);//暴力反射,,,,需注意！！  
+        Person p = (Person) c.newInstance(new ArrayList());  
+        System.out.println(p.name);  
+    }  
+      
+    //创建对象的另一种途径  
+      
+    @Test  
+    public void test5() throws Exception{  
+        Class clazz = Class.forName("com.feng.reflect.Person");  
+        Person  p = (Person)clazz.newInstance();//其实原理就是反射出这个类的无参构造函数进行构造,  
+        //这就是为什么当你创建了有参构造函数后，一定要创建一个无参的构造函数  
+        System.out.println(p.name);  
+    }  
+      
+}  

@@ -1,0 +1,32 @@
+
+
+首先创建一个简单的ListView，并设置对应的属性
+<ListView
+     android:id="@+id/artistsNameView"
+     android:layout_width="fill_parent"
+     android:layout_height="match_parent" 
+     android:divider="@drawable/jblineshape"
+     android:dividerHeight="1sp">
+ </ListView>
+
+
+1
+注意其中两句：对应的就是设置ListView中的Item之间的间隙线的，使用的一个XML文件：jblineshape.xml(实现的是渐变线的效果)
+android:divider="@drawable/jblineshape"
+android:dividerHeight="1sp"
+
+
+配置文件：jblineshape.xml,为渐变效果的，透明->白色->透明（可根据自己需要进行设置
+
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android" >
+    <gradient 
+        android:startColor="#00000000"
+        android:centerColor="#FFFFFF"
+        android:endColor="#00000000"
+    />
+    <corners 
+        android:radius="4dp"
+        />
+</shape>
+

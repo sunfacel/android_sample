@@ -1,0 +1,653 @@
+本博客文章中曾经提到过Ormlite的第三方组件包，Ormlite 是一种ORM工具，并且是一种轻量级别的工具。我们可以使用它来对Android中内嵌的sqlite数据库进行相关的操作。Android 的应用程序应使用 Ormlite for android 版本来进行相关的开发。Ormlite是对android提供的sqlite部分的API进行了封装。提供了更加方便的接口来供使用。
+      本文以一个学生的信息实例程序来展示如何使用ormlite for android的第三方组件来开发Sqlite的C[增加]，R[查询]，U[更新]，D[查询]应用程序，以便更方便的对sqlite数据库的操作。我们先看下程序的结构图：
+
+Android中结合OrmLite for android组件对SQLite的CRUD(增删改查)操作实例-结构图.gif
+
+其中包com.andyidea.bean下Student.java为实体类，包com.andyidea.db下DatabaseHelper.java为数据库辅助类，包com.andyidea.ormsqlite下的MainActivity.java和StudentListActivity.java是界面信息类。同时我们别忘了在根目录下创建一个lib的文件夹，把第三方组件包ormlite-android-4.31.jar ，ormlite-core-4.31.jar，ormlite-jdbc-4.31.jar放到lib文件夹下，然后在项目中引用这三个包就OK了。
+
+
+【2】布局文件源码如下：
+main.xml源码：
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:padding="5dip">
+    <TextView  
+    android:layout_width="fill_parent"  android:layout_height="wrap_content"
+    android:gravity="center" android:text="ORMLite-AddPage"/>
+    <LinearLayout
+       android:layout_width="fill_parent" android:layout_height="wrap_content"
+       android:orientation="horizontal" android:padding="1dip" android:gravity="center_vertical">
+       <TextView 
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="学号: "/>
+       <EditText
+          android:id="@+id/stuno"
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"/>
+    </LinearLayout>
+    <LinearLayout
+       android:layout_width="fill_parent" android:layout_height="wrap_content"
+       android:orientation="horizontal" android:padding="1dip" android:gravity="center_vertical">
+       <TextView 
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="姓名: "/>
+       <EditText
+          android:id="@+id/name"
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"/>
+    </LinearLayout>
+    <LinearLayout
+       android:layout_width="fill_parent" android:layout_height="wrap_content"
+       android:orientation="horizontal" android:padding="1dip" android:gravity="center_vertical">
+       <TextView 
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="年龄: "/>
+       <EditText
+          android:id="@+id/age"
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"/>
+    </LinearLayout>
+    <LinearLayout
+       android:layout_width="fill_parent" android:layout_height="wrap_content"
+       android:orientation="horizontal" android:padding="1dip" android:gravity="center_vertical">
+       <TextView 
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="性别: "/>
+       <EditText
+          android:id="@+id/sex"
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"/>
+    </LinearLayout>
+    <LinearLayout
+       android:layout_width="fill_parent" android:layout_height="wrap_content"
+       android:orientation="horizontal" android:padding="1dip" android:gravity="center_vertical">
+       <TextView 
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="分数: "/>
+       <EditText
+          android:id="@+id/score"
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"/>
+    </LinearLayout>
+    <LinearLayout
+       android:layout_width="fill_parent" android:layout_height="wrap_content"
+       android:orientation="horizontal" android:padding="1dip" android:gravity="center_vertical">
+       <TextView 
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="地址: "/>
+       <EditText
+          android:id="@+id/address"
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"/>
+    </LinearLayout>
+    
+</LinearLayout>
+
+students.xml源码：
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:orientation="vertical"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent">
+  <TextView  
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:text="ORMLite-Students"/>
+  <ListView
+    android:id="@+id/stulist"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"/>
+</LinearLayout>
+
+studentitem.xml源码：
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:orientation="horizontal"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent">
+  <TextView
+     android:id="@+id/itemno"
+     android:layout_width="fill_parent"
+     android:layout_height="wrap_content"
+     android:layout_weight="1"
+     android:text="学号"
+     android:gravity="center"/>
+  <TextView
+     android:id="@+id/itemname"
+     android:layout_width="fill_parent"
+     android:layout_height="wrap_content"
+     android:layout_weight="1"
+     android:text="姓名"
+     android:gravity="center"/>
+  <TextView
+     android:id="@+id/itemscore"
+     android:layout_width="fill_parent"
+     android:layout_height="wrap_content"
+     android:layout_weight="1"
+     android:text="分数"
+     android:gravity="center"/>
+</LinearLayout>
+
+【3】包com.andyidea.bean下Student.java源码：
+
+package com.andyidea.bean;
+
+import java.io.Serializable;
+import com.j256.ormlite.field.DatabaseField;
+
+public class Student implements Serializable {
+
+	private static final long serialVersionUID = -5683263669918171030L;
+	
+	@DatabaseField(id=true)
+	private String stuNO;
+	@DatabaseField
+	private String name;
+	@DatabaseField
+	private int age;
+	@DatabaseField
+	private String sex;
+	@DatabaseField
+	private double score;
+	@DatabaseField
+	private String address;
+	
+	public String getStuNO() {
+		return stuNO;
+	}
+	public void setStuNO(String stuNO) {
+		this.stuNO = stuNO;
+	}
+	
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public int getAge() {
+		return age;
+	}
+	public void setAge(int age) {
+		this.age = age;
+	}
+	
+	public String getSex() {
+		return sex;
+	}
+	public void setSex(String sex) {
+		this.sex = sex;
+	}
+	
+	public double getScore() {
+		return score;
+	}
+	public void setScore(double score) {
+		this.score = score;
+	}
+	
+	public String getAddress() {
+		return address;
+	}
+	public void setAddress(String address) {
+		this.address = address;
+	}
+	
+}
+
+
+【4】包com.andyidea.db下DatabaseHelper.java源码：
+
+package com.andyidea.db;
+
+import java.sql.SQLException;
+
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
+
+import com.andyidea.bean.Student;
+import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
+import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.support.ConnectionSource;
+import com.j256.ormlite.table.TableUtils;
+
+public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
+	
+	private static final String DATABASE_NAME = "ormlite.db";
+	private static final int DATABASE_VERSION = 1;
+	
+	private Dao<Student,Integer> stuDao = null;
+	
+	public DatabaseHelper(Context context){
+		super(context, DATABASE_NAME, null, DATABASE_VERSION);
+	}
+
+	/**
+	 * 创建SQLite数据库
+	 */
+	@Override
+	public void onCreate(SQLiteDatabase sqliteDatabase, ConnectionSource connectionSource) {
+		try {
+			TableUtils.createTable(connectionSource, Student.class);
+		} catch (SQLException e) {
+			Log.e(DatabaseHelper.class.getName(), "Unable to create datbases", e);
+		}
+	}
+
+	/**
+	 * 更新SQLite数据库
+	 */
+	@Override
+	public void onUpgrade(
+			SQLiteDatabase sqliteDatabase, 
+			ConnectionSource connectionSource, 
+			int oldVer,
+			int newVer) {
+		try {
+			TableUtils.dropTable(connectionSource, Student.class, true);
+			onCreate(sqliteDatabase, connectionSource);
+		} catch (SQLException e) {
+			Log.e(DatabaseHelper.class.getName(), 
+					"Unable to upgrade database from version " + oldVer + " to new "
+					+ newVer, e);
+		}
+	}
+	
+	public Dao<Student,Integer> getStudentDao() throws SQLException{
+		if(stuDao == null){
+			stuDao = getDao(Student.class);
+		}
+		return stuDao;
+	}
+
+}
+
+【5】包com.andyidea.ormsqlite下源码：
+MainActivity.java源码：
+package com.andyidea.ormsqlite;
+
+import java.sql.SQLException;
+
+import com.andyidea.bean.Student;
+import com.andyidea.db.DatabaseHelper;
+import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
+import com.j256.ormlite.dao.Dao;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.EditText;
+
+public class MainActivity extends OrmLiteBaseActivity<DatabaseHelper> {
+	
+	private EditText stuNO;
+	private EditText stuName;
+	private EditText stuAge;
+	private EditText stuSex;
+	private EditText stuScore;
+	private EditText stuAddress;
+	
+	private Student mStudent;
+	private Dao<Student,Integer> stuDao;
+	
+	private final int MENU_ADD = Menu.FIRST;
+	private final int MENU_VIEWALL = Menu.FIRST+1;
+	private final int MENU_EDIT = Menu.FIRST+2;
+	
+	private Bundle mBundle = new Bundle();
+	
+    /** Called when the activity is first created. */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+        
+        initializeViews();
+    }
+    
+    /**
+     * 初始化UI界面
+     */
+    private void initializeViews(){
+    	stuNO = (EditText)findViewById(R.id.stuno);
+    	stuName = (EditText)findViewById(R.id.name);
+    	stuAge = (EditText)findViewById(R.id.age);
+    	stuSex = (EditText)findViewById(R.id.sex);
+    	stuScore = (EditText)findViewById(R.id.score);
+    	stuAddress = (EditText)findViewById(R.id.address);
+    	
+    	mBundle = getIntent().getExtras();
+    	if(mBundle!=null && mBundle.getString("action").equals("viewone")){
+    		mStudent = (Student)getIntent().getSerializableExtra("entity");
+    		setStudentUIData(mStudent);
+    	}
+    	
+    	if(mBundle!=null && mBundle.getString("action").equals("edit")){
+    		mStudent = (Student)getIntent().getSerializableExtra("entity");
+    		setStudentUIData(mStudent);
+    	}
+    }
+    
+    @Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+    	if(mBundle!=null && mBundle.getString("action").equals("viewone"))
+    		return false;
+    	else
+    		return super.onPrepareOptionsMenu(menu);
+		
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		if(mBundle!=null && mBundle.getString("action").equals("edit")){
+			menu.add(1,MENU_EDIT,0,"保存");
+		}else{
+	    	menu.add(0,MENU_ADD,0,"增加");
+	    	menu.add(0,MENU_VIEWALL,0,"查看");
+		}
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case MENU_ADD:
+			try {
+				stuDao = getHelper().getStudentDao();
+				getStudentData();
+				if(mStudent != null){
+					//创建记录项
+					stuDao.create(mStudent);
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			break;
+		case MENU_VIEWALL:
+			Intent intent = new Intent();
+			intent.setClass(MainActivity.this, StudentListActivity.class);
+			startActivity(intent);
+			break;
+		case MENU_EDIT:
+			try {
+				getStudentData();
+				stuDao = getHelper().getStudentDao();
+				if(mStudent != null){
+					//更新某记录项
+					stuDao.update(mStudent);
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			break;
+		default:
+			break;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
+	/**
+     * 获取界面值(实体信息)
+     */
+    private void getStudentData(){
+    	mStudent = new Student();
+    	mStudent.setStuNO(stuNO.getText().toString());
+    	mStudent.setName(stuName.getText().toString());
+    	mStudent.setAge(Integer.parseInt(stuAge.getText().toString()));
+    	mStudent.setSex(stuSex.getText().toString());
+    	mStudent.setScore(Double.parseDouble(stuScore.getText().toString()));
+    	mStudent.setAddress(stuAddress.getText().toString());
+    }
+    
+    /**
+     * 赋值给UI界面
+     * @param student
+     */
+    private void setStudentUIData(Student student){
+    	stuNO.setText(student.getStuNO());
+    	stuName.setText(student.getName());
+    	stuAge.setText(String.valueOf(student.getAge()));
+    	stuSex.setText(student.getSex());
+    	stuScore.setText(String.valueOf(student.getScore()));
+    	stuAddress.setText(student.getAddress());
+    }
+}
+
+
+StudentListActivity.java源码：
+package com.andyidea.ormsqlite;
+
+import java.sql.SQLException;
+import java.util.List;
+
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.BaseAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import com.andyidea.bean.Student;
+import com.andyidea.db.DatabaseHelper;
+import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
+import com.j256.ormlite.dao.Dao;
+
+public class StudentListActivity extends OrmLiteBaseActivity<DatabaseHelper> {
+	
+	private Context mContext;
+	private ListView lvStudents;
+	private Dao<Student,Integer> stuDao;
+	private List<Student> students;
+	private StudentsAdapter adapter;
+	private Student mStudent;
+	
+	private final int MENU_VIEW = Menu.FIRST;
+	private final int MENU_EDIT = Menu.FIRST+1;
+	private final int MENU_DELETE = Menu.FIRST+2;
+	
+	private int position;
+	
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.students);
+		mContext = getApplicationContext();
+		
+		lvStudents = (ListView)findViewById(R.id.stulist);
+		registerForContextMenu(lvStudents);  //注册上下文菜单
+		
+		queryListViewItem();
+	
+		adapter = new StudentsAdapter(students);
+		lvStudents.setAdapter(adapter);
+		
+	}
+
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v,
+			ContextMenuInfo menuInfo) {
+		if(v == lvStudents)
+			position = ((AdapterContextMenuInfo)menuInfo).position;
+		
+		menu.add(0,MENU_VIEW, 0, "查看");
+		menu.add(0,MENU_EDIT, 0, "编辑");
+		menu.add(0,MENU_DELETE,0,"删除");
+		super.onCreateContextMenu(menu, v, menuInfo);
+	}
+	
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case MENU_VIEW:
+			viewListViewItem(position);
+			break;
+		case MENU_EDIT:
+			editListViewItem(position);
+			break;
+		case MENU_DELETE:
+			deleteListViewItem(position);
+			break;
+		default:
+			break;
+		}
+		return super.onContextItemSelected(item);
+	}
+	
+	/**
+	 * 查询记录项
+	 */
+	private void queryListViewItem(){
+		try {
+			stuDao = getHelper().getStudentDao();
+			//查询所有的记录项
+			students = stuDao.queryForAll();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * 查看记录项
+	 * @param position
+	 */
+	private void viewListViewItem(int position){
+		mStudent = students.get(position);
+		Intent intent = new Intent();
+		intent.setClass(mContext, MainActivity.class);
+		intent.putExtra("action", "viewone");
+		intent.putExtra("entity", mStudent);
+		startActivity(intent);
+	}
+	
+	/**
+	 * 编辑记录项
+	 */
+	private void editListViewItem(int position){
+		mStudent = students.get(position);
+		Intent intent = new Intent();
+		intent.setClass(mContext, MainActivity.class);
+		intent.putExtra("action", "edit");
+		intent.putExtra("entity", mStudent);
+		startActivity(intent);
+	}
+	
+	/**
+	 * 删除记录项
+	 * @param position
+	 */
+	private void deleteListViewItem(int position){
+		final int pos = position;
+		AlertDialog.Builder builder2 = new AlertDialog.Builder(StudentListActivity.this);
+		builder2.setIcon(android.R.drawable.ic_dialog_alert)
+		        .setTitle("警告")
+		        .setMessage("确定要删除该记录");
+		builder2.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				Student mDelStudent = (Student)lvStudents.getAdapter().getItem(pos);
+				try {
+					stuDao.delete(mDelStudent); //删除记录
+					queryListViewItem();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+				
+			}
+		});
+		builder2.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+			
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
+			}
+		});
+		builder2.show();
+	}
+	
+	class StudentsAdapter extends BaseAdapter{
+		
+		private List<Student> listStu;
+		
+		public StudentsAdapter(List<Student> students){
+			super();
+			this.listStu = students;
+		}
+
+		@Override
+		public int getCount() {
+			return listStu.size();
+		}
+
+		@Override
+		public Student getItem(int position) {
+			return listStu.get(position);
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return position;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			ViewHolder holder;
+			if(convertView == null){
+				LayoutInflater mInflater = (LayoutInflater) mContext
+						.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				convertView = mInflater.inflate(R.layout.studentitem, null);
+				holder = new ViewHolder();
+				holder.tvNO = (TextView)convertView.findViewById(R.id.itemno);
+				holder.tvName = (TextView)convertView.findViewById(R.id.itemname);
+				holder.tvScore = (TextView)convertView.findViewById(R.id.itemscore);
+				convertView.setTag(holder);
+			}else{
+				holder = (ViewHolder)convertView.getTag();
+			}
+			
+			Student objStu = listStu.get(position);
+			holder.tvNO.setText(objStu.getStuNO());
+			holder.tvName.setText(objStu.getName());
+			holder.tvScore.setText(String.valueOf(objStu.getScore()));
+			
+			return convertView;
+		}
+		
+	}
+	
+	static class ViewHolder{
+		TextView tvNO;
+		TextView tvName;
+		TextView tvScore;
+	}
+
+}
+

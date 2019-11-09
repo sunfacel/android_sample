@@ -1,0 +1,233 @@
+public class RollActivity extends Activity {  
+    private View view;  
+    private Button btn;  
+    private PopupWindow mPopupWindow;  
+    private View[] btns;  
+    /** Called when the activity is first created. */  
+    @Override  
+    public void onCreate(Bundle savedInstanceState) {  
+        super.onCreate(savedInstanceState);  
+        setContentView(R.layout.main);  
+//      LinearLayout layout=(LinearLayout) view.findViewById(R.id.layout_main);  
+//      //设置背景图片旋转180  
+//      Bitmap mBitmap=setRotate(R.drawable.bg_kuang);  
+//      BitmapDrawable drawable=new BitmapDrawable(mBitmap);  
+//      layout.setBackgroundDrawable(drawable);  
+          
+        btn=(Button) this.findViewById(R.id.btn);  
+        btn.setOnClickListener(new OnClickListener(){  
+  
+            @Override  
+            public void onClick(View v) {  
+                // TODO Auto-generated method stub  
+                showPopupWindow(btn);  
+            }  
+              
+        });  
+          
+        initPopupWindow(R.layout.popwindow);  
+  
+    }  
+      
+    private void initPopupWindow(int resId){  
+        LayoutInflater mLayoutInflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);  
+        view = mLayoutInflater.inflate(resId, null);  
+              
+        mPopupWindow = new PopupWindow(view, 400,LayoutParams.WRAP_CONTENT);  
+//      mPopupWindow.setBackgroundDrawable(new BitmapDrawable());//必须设置background才能消失  
+        mPopupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.bg_frame));  
+        mPopupWindow.setOutsideTouchable(true);  
+          
+        //自定义动画  
+//      mPopupWindow.setAnimationStyle(R.style.PopupAnimation);  
+        //使用系统动画  
+        mPopupWindow.setAnimationStyle(android.R.style.Animation_Dialog);  
+        mPopupWindow.update();  
+        mPopupWindow.setTouchable(true);  
+        mPopupWindow.setFocusable(true);  
+          
+        btns=new View[3];  
+        btns[0]=view.findViewById(R.id.btn_0);  
+        btns[1]=view.findViewById(R.id.btn_1);  
+        btns[2]=view.findViewById(R.id.btn_2);  
+        btns[0].setOnClickListener(new OnClickListener() {  
+              
+            @Override  
+            public void onClick(View v) {  
+                // TODO Auto-generated method stub  
+                //doSomething  
+            }  
+        });  
+        btns[1].setOnClickListener(new OnClickListener() {  
+              
+            @Override  
+            public void onClick(View v) {  
+                // TODO Auto-generated method stub  
+                //doSomething  
+            }  
+        });  
+        btns[2].setOnClickListener(new OnClickListener() {  
+              
+            @Override  
+            public void onClick(View v) {  
+                // TODO Auto-generated method stub  
+                //doSomething  
+            }  
+        });  
+    }  
+    private void showPopupWindow(View view) {  
+        if(!mPopupWindow.isShowing()){  
+//          mPopupWindow.showAsDropDown(view,0,0);  
+            mPopupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);  
+        }  
+    }  
+    public Bitmap setRotate(int resId) {  
+        Matrix mFgMatrix = new Matrix();  
+        Bitmap mFgBitmap = BitmapFactory.decodeResource(getResources(), resId);  
+        mFgMatrix.setRotate(180f);  
+        return mFgBitmap=Bitmap.createBitmap(mFgBitmap, 0, 0,   
+                mFgBitmap.getWidth(), mFgBitmap.getHeight(), mFgMatrix, true);  
+    }  
+}  
+
+
+
+PopupWindow的布局popwindow.xml 
+注意3个LinearLayout里必须设置clickable和background，这样当点击上去的时候才会有点击效果。 
+android:clickable="true" 
+android:background="@drawable/state_btn_pressed" 
+
+
+<?xml version="1.0" encoding="utf-8"?>  
+ <LinearLayout   
+        xmlns:android="http://schemas.android.com/apk/res/android"  
+        android:layout_width="fill_parent"  
+        android:layout_height="wrap_content"   
+        android:orientation="horizontal"  
+        android:id="@+id/layout_main"  
+        >  
+        <LinearLayout android:layout_width="fill_parent"  
+            android:layout_height="wrap_content"  
+            android:orientation="vertical"  
+            android:gravity="center_horizontal"  
+            android:clickable="true"  
+            android:background="@drawable/state_btn_pressed"  
+            android:layout_weight="1"  
+            android:id="@+id/btn_0"  
+            >  
+            <ImageView android:layout_width="wrap_content"  
+                android:layout_height="wrap_content"   
+                android:scaleType="fitCenter"  
+                android:src="@drawable/ic_call"  
+                >  
+            </ImageView>  
+            <TextView android:layout_width="wrap_content"  
+                android:layout_height="wrap_content"   
+                android:textColor="#000000"  
+                android:textSize="18px"  
+                android:text="电话">  
+            </TextView>  
+        </LinearLayout>  
+        <LinearLayout android:layout_width="fill_parent"  
+            android:layout_height="wrap_content"  
+            android:orientation="vertical"  
+            android:gravity="center_horizontal"  
+            android:clickable="true"  
+            android:background="@drawable/state_btn_pressed"  
+            android:layout_weight="1"  
+            android:id="@+id/btn_1"  
+            >  
+            <ImageView android:layout_width="wrap_content"  
+                android:layout_height="wrap_content"   
+                android:scaleType="fitCenter"  
+                android:src="@drawable/ic_home"  
+                >  
+            </ImageView>  
+            <TextView android:layout_width="wrap_content"  
+                android:layout_height="wrap_content"   
+                android:textColor="#000"  
+                android:textSize="18px"  
+                android:text="空间">  
+            </TextView>  
+        </LinearLayout>  
+          
+        <LinearLayout android:layout_width="fill_parent"  
+            android:layout_height="wrap_content"  
+            android:orientation="vertical"  
+            android:gravity="center_horizontal"  
+            android:clickable="true"  
+            android:background="@drawable/state_btn_pressed"  
+            android:layout_weight="1"  
+            android:id="@+id/btn_2"  
+            >  
+            <ImageView android:layout_width="wrap_content"  
+                android:layout_height="wrap_content"   
+                android:scaleType="fitCenter"  
+                android:src="@drawable/ic_sms"  
+                >  
+            </ImageView>  
+            <TextView android:layout_width="wrap_content"  
+                android:layout_height="wrap_content"   
+                android:textColor="#000"  
+                android:textSize="18px"  
+                android:text="短信"  
+                >  
+            </TextView>  
+        </LinearLayout>  
+</LinearLayout>  
+
+
+
+state_btn_pressed.xml，点击的效果：
+
+<?xml version="1.0" encoding="utf-8"?>  
+<selector xmlns:android="http://schemas.android.com/apk/res/android">  
+    <item android:state_pressed="true"  
+        android:drawable="@drawable/bg_btn_pressed"  
+        android:padding="0dp"/>  
+</selector>  
+
+
+
+
+Android 模仿迅雷的 PopupWindow 出现/消失动画 
+出现：
+
+<?xml version="1.0" encoding="utf-8"?>  
+<set xmlns:android="http://schemas.android.com/apk/res/android">  
+    <scale android:fromXScale="0.6" android:toXScale="1.1"  
+        android:fromYScale="0.6" android:toYScale="1.1" android:pivotX="50%"  
+        android:pivotY="50%" android:duration="200" />  
+    <scale android:fromXScale="1.0" android:toXScale="0.91"  
+        android:fromYScale="1.0" android:toYScale="0.91" android:pivotX="50%"  
+        android:pivotY="50%" android:duration="400" android:delay="200" />  
+    <alpha android:interpolator="@android:anim/linear_interpolator"  
+        android:fromAlpha="0.0" android:toAlpha="1.0" android:duration="400" />  
+</set>  
+
+
+消失：
+
+<?xml version="1.0" encoding="utf-8"?>  
+<set xmlns:android="http://schemas.android.com/apk/res/android">  
+    <scale android:fromXScale="1.0" android:toXScale="1.25"  
+        android:fromYScale="1.0" android:toYScale="1.25" android:pivotX="50%"  
+        android:pivotY="50%" android:duration="200" />  
+    <scale android:fromXScale="1.0" android:toXScale="0.48"  
+        android:fromYScale="1.0" android:toYScale="0.48" android:pivotX="50%"  
+        android:pivotY="50%" android:duration="400" android:delay="200" />  
+    <alpha android:interpolator="@android:anim/linear_interpolator"  
+        android:fromAlpha="1.0" android:toAlpha="0.0" android:duration="400" />  
+</set>  
+
+最后用下面的 XML 封装：
+
+<?xml version="1.0" encoding="utf-8"?>  
+<resources>  
+    <style name="PopupAnimation" parent="android:Animation"  
+        mce_bogus="1">  
+        <item name="android:windowEnterAnimation">@anim/anim_dialog_show</item>  
+        <item name="android:windowExitAnimation">@anim/anim_dialog_hide</item>  
+    </style>  
+</resources>  
+

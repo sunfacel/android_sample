@@ -1,0 +1,24 @@
+家好，我们这一节讲一下，Android获取Ip的一些方法,在我们开发中，有判断手机是否联网，或者想获得当前手机的Ip地址，当然WIFI连接的和
+
+我们3G卡的Ip地址当然是不一样的.
+
+发现如下方法是比较通用的，我尝试了WIFI和G3卡，都获取了争取的Ip地址:代码如下:
+
+public String getLocalIpAddress() {
+    try {
+        for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+            NetworkInterface intf = en.nextElement();
+            for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+                InetAddress inetAddress = enumIpAddr.nextElement();
+                if (!inetAddress.isLoopbackAddress()) {
+                    return inetAddress.getHostAddress().toString();
+                }
+            }
+        }
+    } catch (SocketException ex) {
+        Log.e(LOG_TAG, ex.toString());
+    }
+    return null;
+}
+
+当我的手机处于飞行状态是，获得Ip地址为空，刚好符合要求!!!

@@ -1,0 +1,160 @@
+开发时会用到显示时间的知识点
+
+2013年9月10日实习当中、、、
+Android的小伙伴们，在一些社交网络应用当中，不知道你们知不知道时间是一个很敏感的因素，你需要在某个特地的时间记录某些事情，比如微博，我们可以看到一条微博是在什么时候发表的，什么时候被转发的。其实新闻类的应用更能体现时间，不过时间是稍纵即逝的，新的新闻会把旧的新闻给冲淡掉，但有时我们可能想要回去查找某条新闻发生的时间，如果没有时间标识的话，那就感觉太不人道了。反正在开发中，总会用得上时间的地方，就拿我最近参与的一个项目来说，我要现实一封邮件是什么时候接收的，是在几年、几月、几日、几时、几分收到的，还要标识是在早上还是下午接收的，还有分两种情况显示，一个是在12小时制，一个在24小时制，两者的显示时间的逻辑又是不一样。有时候处理时间挺麻烦，其实也不麻烦，现在Java中关于时间的API已经很完备了，只要会用，基本能满足自己在开发中需求。好了，废话不多说，下面是自己整理的知识点，希望能帮到大家。
+
+1、类 SimpleDateFormat
+类的层次结构
+java.lang.Object
+  继承者 java.text.Format
+      继承者 java.text.DateFormat
+          继承者 java.text.SimpleDateFormat
+
+首先来看看表示时间的一下字母的含义：
+字母	日期或时间元素	表示	示例
+G	Era 标志符	Text	AD
+y	年	Year	1996; 96
+M	年中的月份	Month	July; Jul; 07
+w	年中的周数	Number	27
+W	月份中的周数	Number	2
+D	年中的天数	Number	189
+d	月份中的天数	Number	10
+F	月份中的星期	Number	2
+E	星期中的天数	Text	Tuesday; Tue
+a	Am/pm 标记	Text	PM
+H	一天中的小时数（0-23）	Number	0
+k	一天中的小时数（1-24）	Number	24
+K	am/pm 中的小时数（0-11）	Number	0
+h	am/pm 中的小时数（1-12）	Number	12
+m	小时中的分钟数	Number	30
+s	分钟中的秒数	Number	55
+S	毫秒数	Number	978
+z	时区	General time zone	Pacific Standard Time; PST; GMT-08:00
+Z	时区	RFC 822 time zone	-0800
+示例
+以下示例显示了如何在美国语言环境中解释日期和时间模式。给定的日期和时间为美国太平洋时区的本地时间 2001-07-04 12:08:56。
+日期和时间模式	结果
+"yyyy.MM.dd G 'at' HH:mm:ss z"	2001.07.04 AD at 12:08:56 PDT
+"EEE, MMM d, ''yy"	Wed, Jul 4, '01
+"h:mm a"	12:08 PM
+"hh 'o''clock' a, zzzz"	12 o'clock PM, Pacific Daylight Time
+"K:mm a, z"	0:08 PM, PDT
+"yyyyy.MMMMM.dd GGG hh:mm aaa"	02001.July.04 AD 12:08 PM
+"EEE, d MMM yyyy HH:mm:ss Z"	Wed, 4 Jul 2001 12:08:56 -0700
+"yyMMddHHmmssZ"	010704120856-0700
+"yyyy-MM-dd'T'HH:mm:ss.SSSZ"	2001-07-04T12:08:56.235-0700
+
+2、时间的各种格式
+[java] view plaincopyprint?在CODE上查看代码片派生到我的代码片
+ String[] formats = new String[] {  
+    "yyyy-MM-dd",  
+     "yyyy-MM-dd HH:mm",  
+     "yyyy-MM-dd HH:mmZ",  
+    "yyyy-MM-dd HH:mm:ss.SSSZ",  
+    "yyyy-MM-dd'T'HH:mm:ss.SSSZ",  
+};  
+
+
+yyyy-MM-dd 1969-12-31
+ *                     yyyy-MM-dd 1970-01-01
+ *               yyyy-MM-dd HH:mm 1969-12-31 16:00
+ *               yyyy-MM-dd HH:mm 1970-01-01 00:00
+ *              yyyy-MM-dd HH:mmZ 1969-12-31 16:00-0800
+ *              yyyy-MM-dd HH:mmZ 1970-01-01 00:00+0000
+ *       yyyy-MM-dd HH:mm:ss.SSSZ 1969-12-31 16:00:00.000-0800
+ *       yyyy-MM-dd HH:mm:ss.SSSZ 1970-01-01 00:00:00.000+0000
+ *     yyyy-MM-dd'T'HH:mm:ss.SSSZ 1969-12-31T16:00:00.000-0800
+ *     yyyy-MM-dd'T'HH:mm:ss.SSSZ 1970-01-01T00:00:00.000+0000
+
+
+3、判断是否是24小时制式还是12小时制式
+用到的是DateFormat这个类的is24HourFormat这个方法
+[java] view plaincopyprint?在CODE上查看代码片派生到我的代码片
+/** 判断是否是24小时制**/  
+public static boolean is24Hours(Context context) {  
+    // 获取系统时间制式，是24小时制，还是12小时制  
+    return DateFormat.is24HourFormat(context);  
+}  
+
+
+另外一种方法是：
+[java] view plaincopyprint?在CODE上查看代码片派生到我的代码片
+ContentResolver cv = this.getContentResolver();  
+        String strTimeFormat = android.provider.Settings.System.getString(cv,  
+                                           android.provider.Settings.System.TIME_12_24);  
+          
+        if(strTimeFormat.equals("24"))  
+  
+        {  
+              Log.i("activity","24");  
+        }  
+
+
+
+4、判断当前时间是早上还是下午，用AM表示上午，PM表示下午
+[java] view plaincopyprint?在CODE上查看代码片派生到我的代码片
+//结果为“0”是上午 结果为“1”是下午  
+public class GregorianTest  
+{  
+  public static void main(String args[])  
+  {  
+    GregorianCalendar ca = new GregorianCalendar();  
+    System.out.println(ca.get(GregorianCalendar.AM_PM));  
+  }  
+}  
+
+
+
+我在这里也提供一个方法：
+[java] view plaincopyprint?在CODE上查看代码片派生到我的代码片
+/** 返回日期字符串 */  
+public static String getDateString(Context context, Date date) {  
+    SimpleDateFormat dateFormat = new SimpleDateFormat();  
+    if(is24Hours(context)) {  
+        // HH:mm中的代表24小时制，hh:mm代表12小时制  
+        dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());  
+    } else {  
+        dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm", Locale.getDefault());  
+        // 形式为：00:30   31/12/2013, 6:54 am  
+        return dateFormat.format(date) + getTimeFormat(dateFormat);  
+    }  
+    return dateFormat.format(date);  
+}  
+  
+/** 返回当前时间是上午还是下午**/  
+public static String getTimeFormat(SimpleDateFormat dateFormat) {  
+    int aa = dateFormat.getCalendar().get(Calendar.AM_PM);  
+    String amStr = "";  
+    if(aa== 0) {  
+        amStr = " AM";  
+    } else if(aa == 1) {  
+        amStr = " PM";  
+    }  
+    return amStr;  
+}  
+  
+/** 判断是否是24小时制**/  
+public static boolean is24Hours(Context context) {  
+    // 获取系统时间制式，是24小时制，还是12小时制  
+    return DateFormat.is24HourFormat(context);  
+}  
+
+5. 将字符串转换为指定日期格式
+
+[java] view plaincopyprint?在CODE上查看代码片派生到我的代码片
+String dateString = "20090915-17:20:12";  
+ try {  
+  Date date = new SimpleDateFormat("yyyyMMdd-HH:mm:ss").parse(dateString);  
+  // 下面将字符串转换为日期格式后显示的格式是2009-09-15  
+  System.out.println(DateFormat.getDateInstance().format(date));  
+  // 如果想换一种别的格式，可以用下面的办法，得到任何的日期格式都可以  
+  // 输出的结果为2009/09/15 17:20:12  
+  System.out.println(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(date));  
+  // 输出的结果为2009-09-15 17:20:12  
+  System.out.println(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date));  
+  // SimpleDateFormat sdf2 = new  
+  // SimpleDateFormat("yyyy年MM月dd日");输出的结果为2009年09月15日 17:20:12  
+  System.out.println(new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss").format(date));  
+ } catch (Exception ex) {  
+  System.out.println(ex.getMessage());  
+ }  

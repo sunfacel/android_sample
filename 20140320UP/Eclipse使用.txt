@@ -1,0 +1,99 @@
+说起java的IDE，朗朗上口的无非是Eclipse了，假若能熟练Eclipse，对于我们编写java程序会起到事半功倍的效果，大大提高我们工作效率
+
+1. 常用快捷键
+这是使用工具的第一步，熟练使用快捷键对于我们编写程序会起到相当大帮助，所以这里笔者列出的快捷键建议大家必须都掌握。
+Ctrl + 鼠标左键（类、方法、属性的变量名词）：定位跟踪某变量声明或定义的位置
+Ctrl + S：保存当前文件
+Ctrl + X：剪切
+Ctrl + C：复制
+Ctrl + V：粘贴
+Ctrl + D：删除当前行
+Ctrl + F：查找/替换（当前编辑窗口）
+Ctrl + H：全局搜索
+Ctrl + /：注释当前行或多行代码
+Ctrl + Shift + C：注释当前行或多行代码
+Ctrl + Shift + F：格式化当前代码
+Ctrl + Shift + O：缺少的Import语句被加入，多余的Import语句被删除（先把光标定位到需导入包的类名上）
+Ctrl + Shift + S：保存所有文件
+Ctrl + Shift + X：把当前选中的文本全部变为大写
+Ctrl + Shift + Y：把当前选中的文本全部变为小写
+Alt + /：代码智能提示
+Alt + Shift + R：重命名（包括文件名、类名、方法名、变量名等等，非常好用）
+Alt + Shift + J：生成类或方法的注释
+Alt + Shift + S：打开Source窗口（生成get、set方法，实现、覆盖接口或类的方法，很常用）
+Alt + Shift + D, J：如果有main方法入口，则以Debug方式执行代码
+Alt + Shift + X, J：如果有main方法入口，则以Run方式执行代码
+
+
+2. 插件推荐
+Eclipse默认情况下是一个纯净版的，所以功能简单，而开源IDE最为强大的莫过于各种插件，通过使用插件可以帮助我们减少大量编写代码的工作量，也帮助我们降低了编写代码的难度，所以懂得安装必要插件，也是熟练使用IDE的鉴证。
+①Hibernate Tools
+Hibernate Tools是一套全新而且完整的面向Hibernate3的工具集合，它包含了Eclipse插件和Ant编译流程，是JBoss Tools的核心组件。使用该插件能大大减少我们使用Hibernate的工作量，支持自动生成全部Hibernate的xml文件、javabean、HTML表单文件等。
+安装地址：http://download.jboss.org/jbosstools/updates/development/indigo/
+②Spring IDE
+Spring IDE是Spring官方网站推荐的Eclipse插件，可提供在开发Spring时对Bean定义文件进行提示、验证并以可视化的方式查看各个Bean之间的依赖关系等，对基于spring框架的项目开发提供了有力的支持。
+安装地址：http://dist.springsource.com/release/TOOLS/update/e3.6/
+③Subclipse
+Subclipse是基于Eclipse的SVN插件，支持所有版本的Eclipse，团队开发必备插件。
+安装地址：http://subclipse.tigris.org/update_1.8.x
+④Findbugs
+FindBugs是一个能静态分析源代码中可能会出现Bug的Eclipse插件工具。它检查类或者JAR 文件，将字节码与一组缺陷模式进行对比以发现可能的问题。利用这个工具，就可以在不实际运行程序的情况对软件进行分析。它可以帮助改进代码的质量。
+安装地址：http://findbugs.cs.umd.edu/eclipse/
+⑤Sysdeo Tomcat Launcher Plugin
+Sysdeo Tomcat Launcher Plugin是Tomcat的Eclipse插件，帮助我们自动部署tomcat服务器。该插件不是必要插件，可以不装。
+下载地址：http://www.eclipsetotale.com/tomcatPlugin/tomcatPluginV33.zip
+
+插件安装方法
+插件大概有三种安装方法：
+第一种：知道在线安装地址。Eclipse→Help→Install New Software...→地址栏（Work with）中输入安装地址→勾选要安装的插件→Next→同意安装协议→Finish→等待安装完毕→按要求重启Eclipse
+第二种：手动从官网下载好插件并手动与Eclipse集成。这种方法一般的思路是：先关闭Eclipse，然后将下载好的插件解压后，复制到Eclipse安装目录下的plugins文件夹和features文件夹下，如果必要的话再创建一个link文件，再重新打开Eclipse。
+第三种：在线搜索安装。Eclipse→Help→Eclipse Marketplace...→在搜索栏输入要查找的插件→点击Install按钮→等待安装完毕→按要求重启Eclipse
+这里笔者推荐第一种，如果不知道安装地址，那么就用第三种，第二种方法有时操作错误的话就会出现问题，风险较大，所以不推荐。
+
+
+3. tomcat
+① 配置
+Window→Preferences→Server→Runtime Environment→Add→Apache→选择tomcat版本→Next→更改显示名称（Name）→Browse...浏览选择事先解压好的tomcat文件夹→选择jre→Finish→OK→打开Servers窗体→右击选择New→Server→选择tomcat版本→选择刚配置好的tomcat→Next→选择项目→Finish
+② 使用心得
+当我们修改某处代码后，启动tomcat发现页面没有变化时，要先关掉tomcat，右击Servers窗口中tomcat服务器图标，选择Clean...来清理下编译后的源码，再启动tomcat来重新编译下源码。
+而且如果部署多个，或tomcat异常时，右击Servers窗口中tomcat服务器图标，选择Properties，检查General选项右侧Location是否正确，如果不正确则点击Switch Location。
+虽然一个tomcat支持同时启动多个项目，但项目多启动时会很慢，所以如果不是工程项目需要的话，建议tomcat只部署启动一个项目，将暂时无用的项目移除。
+当web项目启动加载时间过长导致tomcat启动失败的话，可适当延长tomcat启动超时的时间（默认45秒），双击Servers窗口中tomcat服务器打开tomcat属性窗口，点击右上方Timeouts选项，修改Start(in seconds)的时间。
+eclipse默认情况下是调用tomcat接口模拟启动tomcat，而不是真正启动tomcat，所以大家经常会遇到一件怪事：启动tomcat后，虽然能正常进web项目首页，却仅不了tomcat小猫首页（即http://www.2cto.com :8080/），并且web项目部署编译后生成的文件也不在tomcat文件目录下的work目录下。解决办法：如果tomcat服务器下已经部署了项目，就先要将其全部移除，即右击Servers窗口中tomcat服务器图标，选择Add and Remove...，单击Remove All按钮，单击Finish按钮。之后先Clean清理下，再双击tomcat服务器图标打开属性窗口，选择左侧中间Server Locations选项，选择下方第二个单选按钮（Use Tomcat installation），并将Deploy path文本框中的“wtpwebapps”（默认值）改为webapps，也就是tomcat中发布项目所在的文件夹名字，最好再将项目重新部署到tomcat上，启动tomcat后，就可以看到熟悉的小猫页面了，同时在tomcat文件目录下的work文件夹下也能看见熟悉的编译后的页面文件了。
+如果代码出现引入javax.servlet.http.*报错，说明是缺少tomcat的jar包，引入即可。方法：在左侧资源管理器右击项目，选择Build Path下的Configure Build Path...，右侧点击Add Library...按钮，选择Server Runtime，点击Next后选择tomcat，Finish。
+
+
+4. eclipse常见配置
+● 字体大小
+Window→Preferences→General→Appearance→Colors and Fonts→右侧窗口→Basic选项→双击Text Font
+● 修改打开文件的编辑浏览器
+Window→Preferences→General→Editors→File Associations→选择要修改的文件类型→在下方选择编辑浏览器
+● 显示/隐藏代码行号
+Window→Preferences→General→Editors→勾选Show line numbers
+● 添加自定义jar包Libraries
+Window→Preferences→Java→Build Path→User Libraries→右侧点击New...→输入名称→点击Add JARs...→浏览选择相应的jar文件
+● 配置tomcat等服务器
+Window→Preferences→Server→Runtime Environment→Add...→选择需要的服务器（以tomcat为例请见上面tomcat配置）
+● 修改格式化代码的换行判定
+Window→Preferences→Java→Code Style→Formatter→右侧点击New...→输入名称→点击OK→在弹出的窗口选择Line Wrapping选项卡→修改Maixmum line width文本框的值（默认80）
+● 添加xml的dtd、xsd等xml语法规则文件，实现代码自动提示
+Window→Preferences→XML→XML Catalog→右侧点击Add...→Key type选择Public ID→Location浏览选择你所下载的DTD文件的物理位置→Key填入xml文档头部<!DOCTYPE sqlMapConfig PUBLIC 后面的那些url地址→OK
+● 修改编码格式
+右击你要修改的项目/包/类→选择Properties→在Resource选项右侧的Text file encoding下选择你需要的编码格式
+● 相同名称（包括类名、方法名、变量名等等）以不同背景色标识出来
+见下图：
+
+或者按快捷键：Alt + Shift + O
+
+在Window→Preferences下有许多配置，这里并不可能介绍很全，所以只列出最为常用的，大家有时间可能多进这里看看，再多点点多试试就明白了。
+
+
+5. SVN
+● 上传项目至SVN服务器
+右击要上传的项目→Team→Share Project...→SVN→创建新的资源库位置/使用现有的资源库→Next→（输入URL地址）→Next→使用项目名称作为文件夹名→Next→Finish→（输入用户名/密码）
+注意：“使用项目名称作为文件夹名”时，要保证SVN服务器端已创建与项目名称相同的文件夹，否则会导入失败。如果SVN端创建的文件夹名与项目名称不符，则在该步骤选择“使用指定的模块名”以确保SVN服务器端与项目名称一致。
+● 下载项目从SVN服务器
+在资源管理器空白处右击→Import...→选择SVN文件夹→从SVN检出项目→创建新的资源库位置/使用现有的资源库→Next→（输入URL地址）→Next→做为新项目检出，并使用新建项目向导进行配置→Finish→Yes→配置新建项目（如输入项目名称）→OK
+注意：这个“输入URL地址”与上面上传项目的不同，这个URL地址需要输入项目具体所在的文件夹，而上一个因为有“使用项目名称作为文件夹名”这步，所以不需要带文件夹名称。
+● 提交、更新、还原文件
+选中需要提交的文件、jar包、javabean等文件然后右击→Team→选择相应的操作。（这个基本地球人看看都会，所以就不多说了）

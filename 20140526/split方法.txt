@@ -1,0 +1,23 @@
+public String[] split(String regex)
+根据给定的正则表达式的匹配来拆分此字符串。
+该方法的作用就像是使用给定的表达式和限制参数 0 来调用两参数 split 方法。因此，结果数组中不包括结尾空字符串。 
+
+例如：
+
+[java] view plaincopy
+@Test  
+    public void test() throws SQLException{  
+        String testStr="A,B,C";  
+        String [] results =  testStr.split(",");  
+        for (String string : results) {  
+            System.out.println(string);  
+        }  
+    }  
+
+输出如下：
+A
+B
+C
+更多 0
+上一篇常见Flex数据类型
+下一篇mysql单引号和双引号的用法

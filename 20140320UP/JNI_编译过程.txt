@@ -1,0 +1,69 @@
+
+1、下载并安装GNUStep及下载解压NDK.
+   http://www.gnustep.org/experience/Windows.html。
+   GNUStep必须要：GNUStep MSYS System、GNUStep Core、GNUStep Devel三个组件
+
+   http://developer.android.com/tools/sdk/ndk/index.html
+   NDK下载直接解压
+
+2、目录GNUstep\GNUstep\GNUstep.conf文件，添加以下内容：
+   #（g为盘符，后面为路径）
+   NDK=/g/softinstall/Android/android-ndk-r8b
+   export=NDK
+
+3、新建Android工程，在类中独立加入如下：
+
+   //natvie必须声明，用于生成C/C++代码
+    public native String hello();  //hello为一个函数，在C中实现
+   
+    static{
+            System.loadLibrary("testJni");
+
+4、对类文件编译生成H头文件
+   进入工程的主目录，
+   javah -classpath "F:\Android\adt-bundle-windows-x86-20131030\sdk\platforms\android-8\android.jar;bin/classes" -d jni com.xzw.jni.MainActivity
+    需要加上android.jar及路径，否则提示：无法访问android.app.activity
+    需要加上bin/classes目录，指定class文件所在目录，
+    -d jni,在主目录下生成jni目录，存入生成的H头文件
+    com.xzw.jni.TestJni为类文件
+
+5、编写C文件内容，根据生成的H头文件中的函数名称写。
+   函数名可能会很长，与上面指定的hello()不同，加多很多段
+
+6、编写Android.mk.该文件可以直接从NDK的samples下的hello-jni的jni文件下直接靠过来改改就可以了
+  	 LOCAL_PATH := $(call my-dir)
+
+	include $(CLEAR_VARS)
+
+	LOCAL_MODULE    := testJni
+	LOCAL_SRC_FILES := testJni.c
+
+	include $(BUILD_SHARED_LIBRARY)
+    只需要该LOCAL_MODULE和LOCAL_SRC_FILES就可以
+  说明:LOCAL_MODULE是描述模块的，用来给java调用的模块名，会生成对应的libtestJni.so
+LOCAL_SRC_FILES就是源文件啦，多个文件空格隔开即可。
+
+
+7、打开gnustep的命令窗口，进入到项目主目录底下，输入$NDK/ndk-build命令，即可自动生成libs/armeabi/libtestJni.so文件。
+
+
+8、自动编译
+
+右击jni工程的properties-->Builders-->NEW -->;Program 可以看到以下内容：
+在Main标签叶中：
+Location加入：F:\android_assist\GNUstep\msys\1.0\bin\bash.exe
+Working Directory加入:F:\android_assist\GNUstep\msys\1.0\bin
+Arguments加入：--login -c "cd /f/Android/source_dir/testJni && $NDK/ndk-build"
+
+Refresh标签叶中：
+ 选择“The selected resource“
+   选择”Recursively include sub-folders“
+
+Build Options标签叶中：
+  选择：After a clean
+        During manual builds
+        During auto builds
+        During a clean
+   选择：Specify working set of relevant resources并在Specify Resources中选中要编译的项目名。
+
+C文件有改动时，可以自动编译

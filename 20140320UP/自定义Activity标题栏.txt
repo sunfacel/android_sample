@@ -1,0 +1,101 @@
+自定义Activity标题栏(Title bar)和窗体显示状态操作（requestWindowFeature()的应用）
+
+重要方法那就是requestWindowFeature(featrueId),它的功能是启用窗体的扩展特性。参数是Window类中定义的常量。
+1.DEFAULT_FEATURES：系统默认状态，一般不需要指定
+2.FEATURE_CONTEXT_MENU：启用ContextMenu，默认该项已启用，一般无需指定
+3.FEATURE_CUSTOM_TITLE：自定义标题。当需要自定义标题时必须指定。如：标题是一个按钮时
+4.FEATURE_INDETERMINATE_PROGRESS：不确定的进度
+5.FEATURE_LEFT_ICON：标题栏左侧的图标
+6.FEATURE_NO_TITLE：吴标题
+7.FEATURE_OPTIONS_PANEL：启用“选项面板”功能，默认已启用。
+8.FEATURE_PROGRESS：进度指示器功能
+9.FEATURE_RIGHT_ICON:标题栏右侧的图标
+
+
+1.标题显示电池容量
+
+布局代码（titlebar.xml）
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+>
+        <TextView
+                android:text="@string/app_name"
+                android:textColor="#000"
+                android:paddingRight="3.0dip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        <TextView
+                android:text="@string/battery_text"
+                android:textColor="#000"
+                android:paddingRight="3.0dip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        <TextView
+                android:id="@+id/battery_text"
+                android:textColor="#00f"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+</LinearLayout>
+
+
+
+Java代码：
+public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        requestWindowFeature(Window.FEATURE_CUSTOM_TITLE); 
+
+        setContentView(R.layout.main);
+
+        //自定义标题栏
+        mWindow = getWindow();
+        mWindow.setFeatureInt(Window.FEATURE_CUSTOM_TITLE,R.layout.titlebar);
+
+        mBatteryText = (TextView)findViewById(R.id.battery_text);
+
+        mBatteryInforeceiver = new BroadcastReceiver(){
+
+             @Override
+             public void onReceive(Context context, Intent intent) {
+                     int level = intent.getIntExtra("level", 0);
+                     int scale = intent.getIntExtra("scale", 1);
+                     mBatteryText.setText(String.valueOf((int)(level*100/scale))+"%");
+             }
+             
+        };
+}
+还可以添加其他控件，而这些控件的获取和事件响应都是直接在activity里面完成。
+
+-------------------------------------------
+
+
+2.表示一个进程正在运行
+progress.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+    <ProgressBar android:id="@+id/progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"     
+            android:layout_gravity="center_vertical"
+            style="?android:attr/progressBarStyleSmallTitle">
+    </ProgressBar>
+</LinearLayout>
+
+Java代码
+public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        setContentView(R.layout.main);
+
+        getWindow().setFeatureInt(Window.FEATURE_INDETERMINATE_PROGRESS, R.layout.progress);
+        setProgressBarIndeterminateVisibility(true); //适当时候set false来隐藏
+
+        //...
+}

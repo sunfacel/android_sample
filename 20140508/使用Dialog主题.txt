@@ -1,0 +1,35 @@
+使用Dialog主题:
+另外一种简单的显示对话框的方式是让Activity以Dialog的方式来工作（假装？），这种Activity被称作浮动Activity。这种Activity可以通过配置它的主题来实现，我们可以在AndroidManifest.xml中进行类似如下的配置：
+<activity android:name=”.DialogActivity” android:label=”@string/activity_dialog” android:theme=”@android:style/Theme.Dialog”>
+…
+</activity>
+这样，该Activity就会应用了 ‘Theme.Dialog’的主题而看起来像对话框了。
+原文：http://www.oschina.net/discuss/thread/1567
+创建对话框方法dialog()
+protected void dialog() {
+  AlertDialog.Builder builder = new Builder(Main.this);
+  builder.setMessage("确认退出吗？");
+  builder.setTitle("提示");
+  builder.setPositiveButton("确认", new OnClickListener() {
+   @Override
+   public void onClick(DialogInterface dialog, int which) {
+    dialog.dismiss();
+    Main.this.finish();
+   }
+  });
+  builder.setNegativeButton("取消", new OnClickListener() {
+   @Override
+   public void onClick(DialogInterface dialog, int which) {
+    dialog.dismiss();
+   }
+  });
+  builder.create().show();
+ }
+ 
+在onKeyDown(int keyCode, KeyEvent event)方法中调用此方法
+public boolean onKeyDown(int keyCode, KeyEvent event) {
+  if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+   dialog();
+  }
+  return false;
+ }

@@ -1,0 +1,25 @@
+﻿Template Method 
+
+Factory Method 
+
+Observer 
+
+Abstract Factory 
+
+Adapter 
+
+Composite 
+
+Strategy 
+
+State 
+
+Proxy 
+
+Bridge 
+
+Iterator 
+
+Mediator 
+
+Facade 

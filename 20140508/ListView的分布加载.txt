@@ -1,0 +1,264 @@
+ Android应用开发中，采用ListView组件来展示数据是很常用的功能，当一个应用要展现很多的数据时，一般情况下都不会把所有的数据一次就展示出来，而是通过分页的形式来展示数据，个人觉得这样会有更好的用户体验。因此，很多应用都是采用分批次加载的形式来获取用户所需的数据。例如：微博客户端可能会在用户滑动至列表底端时自动加载下一页数据，也可能在底部放置一个"查看更多"按钮，用户点击后，加载下一页数据。
+           下面通过一个Demo来展示ListView功能如何实现：该Demo通过在ListView列表的底部添加一个“查看更多...”按钮来加载新闻(模拟新闻客户端)分页数据。同时限定每次加载10条记录，但完全加载完数据后，就把ListView列表底部视图“查看更多...”删除。假设加载的数据总数为 38 条记录。
+
+用到两个类：其中包 com.andyidea.bean中News.java类是新闻实体类，包com.andyidea.listview中paginationListViewActivity.java类是用来展示ListView列表。
+用到三个Layout,布局layout中包含三个布局文件，分别为：list_item.xml ， loadmore.xml ， main.xml 。下面分别贴下源码：
+list_item.xml:
+<span style="font-size:13px;"><?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent"
+  android:orientation="vertical">
+  <TextView
+     android:id="@+id/newstitle"
+     android:layout_width="fill_parent"
+     android:layout_height="wrap_content"/>
+  <TextView
+     android:id="@+id/newscontent"
+     android:layout_width="fill_parent"
+     android:layout_height="wrap_content"/>
+</LinearLayout></span>
+
+loadmore.xml源码:
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent">
+  <Button  
+      android:id="@+id/loadMoreButton"  
+      android:layout_width="fill_parent"  
+      android:layout_height="wrap_content"
+      android:text="查看更多..." /> 
+</LinearLayout>
+
+main.xml源码：
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    <ListView
+       android:id="@+id/lvNews"
+       android:layout_width="fill_parent"
+       android:layout_height="wrap_content"/>
+</LinearLayou
+
+包 com.andyidea.bean中News.java类源码：
+package com.andyidea.bean;
+
+/**
+ * 新闻实体类
+ * @author Andy.Chen
+ * @mail Chenjunjun.ZJ@gmail.com
+ *
+ */
+public class News {
+	
+	private String title;    //标题
+	private String content;  //内容
+	
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	public String getContent() {
+		return content;
+	}
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+}
+
+
+包com.andyidea.listview中paginationListViewActivity.java类源码：
+
+package com.andyidea.listview;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.andyidea.bean.News;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+public class PaginationListViewActivity extends Activity implements OnScrollListener {
+	
+	private ListView listView;  
+    private int visibleLastIndex = 0;   //最后的可视项索引  
+    private int visibleItemCount;       // 当前窗口可见项总数  
+    private int datasize = 38;          //模拟数据集的条数
+    private PaginationAdapter adapter;  
+    private View loadMoreView;  
+    private Button loadMoreButton;  
+    private Handler handler = new Handler(); 
+	
+    /** Called when the activity is first created. */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+        
+        loadMoreView = getLayoutInflater().inflate(R.layout.loadmore, null);
+        loadMoreButton = (Button)loadMoreView.findViewById(R.id.loadMoreButton);
+        loadMoreButton.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				loadMoreButton.setText("正在加载中...");   //设置按钮文字
+				handler.postDelayed(new Runnable() {
+					
+					@Override
+					public void run() {
+						loadMoreData();
+						adapter.notifyDataSetChanged();
+						loadMoreButton.setText("查看更多...");  //恢复按钮文字
+					}
+				},2000);
+				
+			}
+		});
+        
+        listView = (ListView)findViewById(R.id.lvNews);
+        listView.addFooterView(loadMoreView);    //设置列表底部视图
+        initializeAdapter();
+        listView.setAdapter(adapter);
+        listView.setOnScrollListener(this);
+    }
+    
+    @Override
+	public void onScrollStateChanged(AbsListView view, int scrollState) {
+		int itemsLastIndex = adapter.getCount()-1;  //数据集最后一项的索引  
+		int lastIndex = itemsLastIndex + 1;
+		if (scrollState == OnScrollListener.SCROLL_STATE_IDLE
+				&& visibleLastIndex == lastIndex) {
+			// 如果是自动加载,可以在这里放置异步加载数据的代码
+		}
+	}
+
+
+	@Override
+	public void onScroll(AbsListView view, int firstVisibleItem,
+			int visibleItemCount, int totalItemCount) {
+		this.visibleItemCount = visibleItemCount;
+		visibleLastIndex = firstVisibleItem + visibleItemCount - 1;
+		
+		Log.e("========================= ","========================");
+		Log.e("firstVisibleItem = ",firstVisibleItem+"");
+		Log.e("visibleItemCount = ",visibleItemCount+"");
+		Log.e("totalItemCount = ",totalItemCount+"");
+		Log.e("========================= ","========================");
+		
+		//如果所有的记录选项等于数据集的条数，则移除列表底部视图
+		if(totalItemCount == datasize+1){
+			listView.removeFooterView(loadMoreView);
+			Toast.makeText(this, "数据全部加载完!", Toast.LENGTH_LONG).show();
+		}
+	}
+	
+	/**
+	 * 初始化ListView的适配器
+	 */
+	private void initializeAdapter(){
+		List<News> news = new ArrayList<News>();
+		for(int i=1;i<=10;i++){
+			News items = new News();
+			items.setTitle("Title"+i);
+			items.setContent("This is News Content"+i);
+			news.add(items);
+		}
+		adapter = new PaginationAdapter(news);
+	}
+	
+	/**
+	 * 加载更多数据
+	 */
+	private void loadMoreData(){
+		int count = adapter.getCount();
+		
+		if(count+10 <= datasize){
+			for(int i=count+1; i<=count+10; i++){
+				News item = new News();
+				item.setTitle("Title"+i);
+				item.setContent("This is News Content"+i);
+				adapter.addNewsItem(item);
+			}
+		}else{
+			for(int i=count+1; i<=datasize; i++){
+				News item = new News();
+				item.setTitle("Title"+i);
+				item.setContent("This is News Content"+i);
+				adapter.addNewsItem(item);
+			}
+		}
+		
+	}
+    
+    
+    class PaginationAdapter extends BaseAdapter{
+    	
+    	List<News> newsItems;
+    	
+    	public PaginationAdapter(List<News> newsitems){
+    		this.newsItems = newsitems;
+    	}
+
+		@Override
+		public int getCount() {
+			return newsItems.size();
+		}
+
+		@Override
+		public Object getItem(int position) {
+			return newsItems.get(position);
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return position;
+		}
+
+		@Override
+		public View getView(int position, View view, ViewGroup parent) {
+			if(view == null){
+				view = getLayoutInflater().inflate(R.layout.list_item, null);
+			}
+			
+			//新闻标题
+			TextView tvTitle = (TextView)view.findViewById(R.id.newstitle);
+			tvTitle.setText(newsItems.get(position).getTitle());
+			//新闻内容
+			TextView tvContent = (TextView)view.findViewById(R.id.newscontent);
+			tvContent.setText(newsItems.get(position).getContent());
+			
+			return view;
+		}
+		
+		/**
+		 * 添加数据列表项
+		 * @param newsitem
+		 */
+		public void addNewsItem(News newsitem){
+			newsItems.add(newsitem);
+		}
+    	
+    }
+
+}
+

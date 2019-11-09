@@ -1,0 +1,30 @@
+android 检查可用网络的代码
+
+判断有没有可用的网络，如果没有则跳到相应的网络设置页面：
+private boolean CheckNetwork() {
+       boolean flag = false;
+       ConnectivityManager cwjManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+       if (cwjManager.getActiveNetworkInfo() != null)
+           flag = cwjManager.getActiveNetworkInfo().isAvailable();
+       if (!flag) {
+           Builder b = new AlertDialog.Builder(this).setTitle("没有可用的网络").setMessage("请开启GPRS或WIFI网络连接");
+           b.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+               public void onClick(DialogInterface dialog, int whichButton) {
+                   Intent mIntent = new Intent("/");
+                   ComponentName comp = new ComponentName("com.android.settings", "com.android.settings.WirelessSettings");
+                   mIntent.setComponent(comp);
+                   mIntent.setAction("android.intent.action.VIEW");
+                   startActivity(mIntent);
+               }
+           }).setNeutralButton("取消", new DialogInterface.OnClickListener() {
+               public void onClick(DialogInterface dialog, int whichButton) {
+                   dialog.cancel();
+               }
+           }).create();
+           b.show();
+       }
+
+
+
+       return flag;
+   }

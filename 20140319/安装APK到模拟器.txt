@@ -1,0 +1,10 @@
+通过命令行往Android模拟器安装apk文件
+1.      启动模拟器（用命令行启动）
+a)        进入emulator.exe的目录E:\wuwj\Android\android-sdk-windows\tools
+b)        启动emulator –avd Android2.3.3
+
+2.      增加环境变量
+a)        【我的电脑】->【属性】->【高级】->【环境变量】->【PATH】
+b)        增加adb.exe所在目录，我这里是
+“E:\wuwj\Android\android-sdk-windows\platform-tools”
+c)        adb  install e:/apk/OOBDirect_20130725.apk

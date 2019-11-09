@@ -1,0 +1,54 @@
+如何让程序5秒钟更新一下Title.
+
+Android 引进了Handler 这个特殊的类，可以说它是Runnable和Activity交互的桥梁
+
+，所以我们只要在run方法中发送Message,而在Handler里，通过不同的Message执行不同的任务。
+
+package com.android.tutor;
+import java.util.Timer;
+import java.util.TimerTask;
+import android.app.Activity;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+public class HandlerDemo extends Activity {
+    
+	//title为setTitle方法提供变量,这里为了方便我设置成了int型
+	private int title = 0;
+	
+	private Handler mHandler = new Handler(){
+		
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
+			case 1:
+				updateTitle();
+				break;
+			}
+		};
+	};
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+        
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new MyTask(), 1, 5000);
+    }
+        
+    private class MyTask extends TimerTask{
+		@Override
+		public void run() {
+			
+			Message message = new Message();
+			message.what = 1;
+			mHandler.sendMessage(message);
+			
+		}  	
+    }
+    
+    
+    public void updateTitle(){
+    	
+    	setTitle("Welcome to Mr Wei's blog " + title);
+		title ++;
+    }
+}

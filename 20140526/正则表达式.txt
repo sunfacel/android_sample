@@ -1,0 +1,138 @@
+
+1、用途：字符匹配 字符串查找 字符串替换
+public class Test {  
+    public static void main(String[] args) {  
+        System.out.println("abc".matches("..."));  
+    }  
+}  
+
+输出true.表示条件为真，匹配。三个点表示，三个字符。
+
+
+2、
+
+java.util.regex.Pattern; 这是java的正则表达式的样式类，里面有个很重要的方法：
+Pattern.compile(String);这个方法的作用是将给定的正则表达式编译到模式中。
+比如：Pattern p = Pattern.compile("[a-z]{3}");  
+干嘛要先编译到模式中去，因为先编译好后，在匹配时可以直接匹配，不用现场编译，节省时间。
+
+java.util.regex.Matcher 这个是java的正则表达式的适配器。是保存匹配结果的。
+如：Matcher m = p.matcher("abc");  
+public class Test {  
+    public static void main(String[] args) {  
+        p("abc".matches("..."));  
+        p("87sf2a".replaceAll("\\d", "-"));  
+        Pattern p = Pattern.compile("[a-z]{3}");  
+        Matcher m = p.matcher("abc");  
+        p(m.matches());  
+        p("abc".matches("[a-z]{3}"));  
+    }  
+    public static void p(Object o){  
+        System.out.println(o);  
+    }  
+}  
+
+输出：true
+      --sf-a
+      true
+      true
+
+3、特别用法
+x？ 代表x出现零次或1次
+x*代表x0次或多次
+x+代表x1次或多次
+X{n} x出现n次
+x{n,}最少出现x N次
+
+范围是用中括号表示的，下面看代码：
+public class TestRegular {  
+    public static void main(String[] args) {  
+        p("a".matches("[abc]"));//匹配其中一个  
+        p("a".matches("[^abc]"));//匹配除abc之外的字符  
+        p("A".matches("[a-zA-Z]"));//匹配a到z和A到Z  
+        p("A".matches("[a-z]|[A-Z]"));//同上  
+        p("A".matches("[a-z[A-Z]]"));//同上  
+        p("R".matches("[A-Z&&[RFG]]"));//A到Z并且是RFG其中的一个  
+    }  
+    public static void p(Object o){  
+        System.out.println(o);  
+    }  
+}  
+
+
+4、
+\d 匹配数字0-9
+\D 匹配非0-9数字
+\s 空白字符
+\S 非空白字符
+\w  字符[a-zA-Z_0-9]
+\W 以上取反
+注意：如何匹配一个反斜杠？
+p("\\".matches("\\\\"));  
+
+仔细体会下为什么。
+
+5、
+要求找出字符串中所有匹配“love”的字符串，不区分大小写，第奇数个换成大写，偶数个换成小写
+
+import java.util.regex.Matcher;  
+import java.util.regex.Pattern;  
+ 
+public class TestRegular {  
+    public static void main(String[] args) {  
+        Pattern p = Pattern.compile("love",Pattern.CASE_INSENSITIVE);//忽略大小写  
+        Matcher m = p.matcher("love Love LOVE Iloveyoue do you Love me  haha");  
+        StringBuffer sb = new StringBuffer();  
+        int i = 0;  
+        while(m.find()){  
+            ++i;  
+            if(i%2==0){  
+                m.appendReplacement(sb, "love");//替换后加到StringBuffer里面  
+            }else{  
+                m.appendReplacement(sb, "LOVE");  
+            }  
+        }  
+        m.appendTail(sb);//添加尾巴  
+        p(sb);  
+    }  
+    public static void p(Object o){  
+        System.out.println(o);  
+    }  
+}  
+注意：最后要加上m.appendTail(sb);这句，否则尾巴就没了
+
+
+6、
+先看一段代码：
+import java.util.regex.Matcher;  
+import java.util.regex.Pattern;  
+public class TestRegular {  
+    public static void main(String[] args) {  
+        Pattern p = Pattern.compile(".{3}a");  
+        String s ="333a66b";  
+        Matcher m = p.matcher(s);  
+        while(m.find()){  
+            p(m.group());  
+        }  
+    }  
+    public static void p(Object o){  
+        System.out.println(o);  
+    }  
+}  
+
+输出：
+333a
+如果我们把Pattern改成这样：
+Pattern p = Pattern.compile(".{3}(?=a)");  
+看看输出：
+333
+在小括号里加入?=表示非捕获字符组。即那个组不捕获。
+
+如果把?=a放到前面：
+
+Pattern p = Pattern.compile("(?=a).{3}");  
+
+结果输出：
+a66
+
+写到后面和写到前面不一样，写到前面表示，以a开头，并且只打印3个。我嘞个去。。。。这个太难记忆，用的也少。可不必理会。

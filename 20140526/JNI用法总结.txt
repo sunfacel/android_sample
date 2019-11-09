@@ -1,0 +1,13 @@
+
+1、引用第三方的C文件。
+   jni/Android.mk文件分多节指定不同的C文件。
+   每个节的local-module的名字不同
+   local-module下面的include $(BUILD_STATIC_LIBRARY)指定引用方式
+   引用第三方C文件的文件，要指定引用的local-module名：
+     LOCAL_STATIC_LIBRARIES := practise-first
+
+2、带参数
+   C文件中，函数的参数，如int应为jint.int也可以,jstring为string
+
+
+  

@@ -1,0 +1,192 @@
+ java加密与解密
+分类： java基础 2013-04-28 15:53 220人阅读 评论(0) 收藏 举报
+java加密解密
+[java] view plaincopy
+package com.wf.security;  
+  
+import java.security.Key;  
+import java.security.Security;  
+  
+import javax.crypto.Cipher;  
+  
+/** 
+ * 加密解密类 
+ * @author wangfeng 
+ * @since 2013-4-27 15:50:26 
+ * @version 1.0 
+ * 
+ */  
+public class EncryptionDecryption {  
+    private static String strDefaultKey = "wfkey";  
+      
+    /** 加密工具 */  
+    private Cipher encryptCipher = null;  
+      
+    /** 解密工具 */  
+    private Cipher decryptCipher = null;  
+      
+    /** 
+     * 将byte数组转换为表示16进制的字符串 
+     * @param arrB 需要转换的byte数组 
+     * @return 16进制表示的字符串 
+     * @throws Exception 
+     */  
+    public static String byteArr2HexStr(byte[] arrB) throws Exception{  
+        int bLen = arrB.length;  
+        //每个字符占用两个字节，所以字符串的长度需是数组长度的2倍  
+        StringBuffer strBuffer = new StringBuffer(bLen*2);  
+        for(int i=0; i != bLen; ++i){  
+            int intTmp = arrB[i];  
+            //把负数转化为正数  
+            while(intTmp < 0){  
+                intTmp = intTmp + 256;//因为字一个字节是8位，从低往高数，第9位为符号为，加256，相当于在第九位加1  
+            }  
+            //小于0F的数据需要在前面补0，(因为原来是一个字节，现在变成String是两个字节，如果小于0F的话，说明最大也盛不满第一个字节。第二个需补充0)  
+            if(intTmp < 16){  
+                strBuffer.append("0");  
+            }  
+            strBuffer.append(Integer.toString(intTmp,16));  
+        }  
+        return strBuffer.toString();  
+    }  
+      
+      
+    /** 
+     * 将表示16进制的字符串转化为byte数组 
+     * @param hexStr 
+     * @return 
+     * @throws Exception 
+     */  
+    public static byte[] hexStr2ByteArr(String hexStr) throws Exception{  
+        byte[] arrB = hexStr.getBytes();  
+        int bLen = arrB.length;  
+        byte[] arrOut = new byte[bLen/2];  
+        for(int i=0; i<bLen; i = i+2){  
+            String strTmp = new String(arrB,i,2);  
+            arrOut[i/2] = (byte)Integer.parseInt(strTmp,16);  
+        }  
+        return arrOut;  
+    }  
+      
+    /** 
+     * 默认构造器，使用默认密匙 
+     * @throws Exception 
+     */  
+    public EncryptionDecryption() throws Exception {  
+        this(strDefaultKey);  
+    }  
+  
+      
+      
+    /** 
+     * 指定密匙构造方法 
+     * @param strKey 指定的密匙 
+     * @throws Exception 
+     */  
+       @SuppressWarnings("restriction")  
+    public EncryptionDecryption(String strKey) throws Exception {  
+            Security.addProvider(new com.sun.crypto.provider.SunJCE());  
+            Key key = getKey(strKey.getBytes());  
+  
+            encryptCipher = Cipher.getInstance("DES");  
+            encryptCipher.init(Cipher.ENCRYPT_MODE, key);  
+  
+            decryptCipher = Cipher.getInstance("DES");  
+            decryptCipher.init(Cipher.DECRYPT_MODE, key);  
+        }  
+  
+    /** 
+     * 加密字节数组 
+     * @param arrB 需加密的字节数组 
+     * @return 加密后的字节数组 
+     * @throws Exception 
+     */  
+    public byte[] encrypt(byte[] arrB) throws Exception{  
+        return encryptCipher.doFinal(arrB);  
+    }  
+      
+    /** 
+     * 加密字符串 
+     * @param strIn 需加密的字符串 
+     * @return 加密后的字符串 
+     * @throws Exception 
+     */  
+    public String encrypt(String strIn) throws Exception{  
+        return byteArr2HexStr(encrypt(strIn.getBytes()));  
+    }  
+      
+    /** 
+     * 解密字节数组 
+     * @param arrB 需解密的字节数组 
+     * @return 解密后的字节数组 
+     * @throws Exception 
+     */  
+    public byte[] decrypt(byte[] arrB) throws Exception{  
+        return decryptCipher.doFinal(arrB);  
+    }  
+      
+    /** 
+     * 解密字符串 
+     * @param strIn 需解密的字符串 
+     * @return 解密后的字符串 
+     * @throws Exception 
+     */  
+    public String decrypt(String strIn) throws Exception{  
+        try{  
+            return new String(decrypt(hexStr2ByteArr(strIn)));  
+        }catch (Exception e) {  
+            return "";  
+        }  
+    }  
+      
+      
+    /** 
+     * 从指定字符串生成密匙，密匙所需的字节数组长度为8位，不足8位时，后面补0，超出8位时，只取前面8位 
+     * @param arrBTmp 构成字符串的字节数组 
+     * @return 生成的密匙 
+     * @throws Exception 
+     */  
+    private Key getKey(byte[] arrBTmp) throws Exception{  
+        byte[] arrB = new byte[8]; //默认为0  
+        for(int i=0; i<arrBTmp.length && i < arrB.length; ++i){  
+            arrB[i] = arrBTmp[i];  
+        }  
+          
+        //生成密匙  
+        Key key = new javax.crypto.spec.SecretKeySpec(arrB,"DES");  
+        return key;  
+    }  
+      
+}  
+这里用DES算法，SUN还提供了别的算法。这里只是其中一种。
+
+测试代码：
+
+[java] view plaincopy
+package com.wf.test;  
+  
+import org.junit.Test;  
+  
+import com.wf.security.EncryptionDecryption;  
+  
+public class EncryptionTest {  
+    @Test  
+    public void test() throws Exception{  
+        EncryptionDecryption des = new EncryptionDecryption("wf");  
+        String oldStr = "wangfeng";  
+        String newStr = "";  
+        newStr = des.encrypt(oldStr);  
+        System.out.println("加密后:   "+newStr);  
+        oldStr = "";//清楚老数据  
+        oldStr = des.decrypt(newStr);  
+        System.out.println("解密后：  "+oldStr);  
+    }  
+}  
+
+输出信息：
+加密后:   d59c46653b72a6248e03aa55a8fdad6c
+解密后：  wangfeng
+
+更多 0
+上一篇java每日面试题2013/4/27
+下一篇美妙的微机原理2013/5/1

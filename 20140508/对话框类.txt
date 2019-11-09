@@ -1,0 +1,117 @@
+使用Dialog类:
+让我们先来看下如何借助Dialog类创建对话框，首先，我们需要定义一个继承了Dialog类的子类:
+class MyDialog extends Dialog {
+    public MyDialog(Context context) {
+        super(context);
+    }
+}
+然后，为这个对话框的内容定义一个布局文件，比如：
+<?xml version=”1.0″ encoding=”utf-8″?>
+    <LinearLayout
+        android:id=”@+id/widget28″
+     android:layout_width=”fill_parent”
+     android:layout_height=”fill_parent”
+     android:orientation=”vertical”
+     xmlns:android=”http://schemas.android.com/apk/res/android”>
+        <TextView
+            android:id=”@+id/nameMessage”
+        android:layout_width=”fill_parent”
+        android:layout_height=”wrap_content”
+        android:text=”Enter Name:”></TextView>
+        <EditText
+            android:id=”@+id/nameEditText”
+        android:layout_width=”fill_parent”
+        android:layout_height=”wrap_content”
+        android:textSize=”18sp”></EditText>
+        <LinearLayout
+            android:id=”@+id/buttonLayout”
+        android:layout_width=”fill_parent”
+        android:layout_height=”wrap_content”
+        android:layout_gravity=”center_horizontal”>
+           <Button
+               android:id=”@+id/okButton”
+          android:layout_width=”wrap_content”
+          android:layout_height=”wrap_content”
+          android:text=”OK”></Button>
+          <Button
+               android:id=”@+id/cancelButton”
+          android:layout_width=”wrap_content”
+          android:layout_height=”wrap_content”
+          android:text=”Cancel”></Button>
+     </LinearLayout>
+</LinearLayout>
+接着，将上面这份布局文件应用到我们的对话框上来：
+class MyDialog extends Dialog {
+    ….
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.d(”TestApp”, “Dialog created”);
+        setContentView(R.layout.mydialog);
+    }
+}
+现在，我们就可以调用这个对话框类的show方法来让它显示：
+…
+MyDialog dialog = new MyDialog(context);
+dialog.show();
+…
+
+----------------------------------------------------
+
+对话框组件的事件处理机制和Activity是相同的，让我们来看下如何处理对话框中的OK和Cancle按钮的事件：
+class MyDialog extends Dialog implements OnClickListener {
+    private Button           okButton;
+    private Button           cancelButton;
+    private EditText         nameEditText;
+   
+    protected void onCreate(Bundle savedInstanceState) {
+         okButton = (Button) findViewById(R.id.okButton);
+         cancelButton = (Button) findViewById(R.id.cancelButton);
+         nameEditText = (EditText) findViewById(R.id.nameEditText);
+         okButton.setOnClickListener(this);
+         cancelButton.setOnClickListener(this);
+    }
+    public void onClick(View view) {
+        switch (view.getId()) {
+             case R.id.okButton:
+                  dismiss();
+                  break;
+            case R.id.cancelButton:
+                  cancel();
+                  break;
+        }
+    }
+}
+在对话框关闭时，对话框类的dismiss()方法将会被调用，该方法可以被对话框自身调用，也可以被其他外部代码调用。
+对话框支持“取消”功能，“取消”的含义是指不再需要执行对话框上的任何功能和动作。对话框的取消可以通过调用cancel()方法来实现。取消对话框也将会自动调用dismiss()方法。
+当用户点击手机设备上的“返回”按钮时，屏幕上的对话框将会被取消，如果你想让你的对话框不在这种情况下被取消掉的话，你可以如下设置你的对话框：
+setCancelable(false);
+对话框的取消和关闭事件可以通过OnCancelListener和OnDismissListener两个监听器来被监听处理。
+
+
+
+
+从对话框中返回信息:
+现在，到了我们要从对话框上获取用户输入的值，将它返回到主调的Activity中的时候了。然而， Dialog类并没有提供可以直接返回这些值的方法…但是，我们可以使用自己创建的监听类：
+public interface MyDialogListener {
+    public void onOkClick(String name);
+    public void onCancelClick();
+}
+我们的对话框类的构造方法同时需要作一点小小的修改：
+public MyDialog(Context context, MyDialogListener listener) {
+    super(context);
+    this.listener = listener;
+}
+接着，你就得在创建这个对话框的时候提供一个已经实现了MyDialogListener这接口的监听器实现对象了。
+然后，我们要在对话框的onclick方法中传出这个值：
+public void onClick(View view) {
+    switch (view.getId()) {
+        case R.id.okButton:
+             listener.onOkClick(nameEditText.getText().toString());
+             dismiss();
+             break;
+        case R.id.cancelButton:
+            cancel();
+            break;
+    }
+}

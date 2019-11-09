@@ -1,0 +1,3 @@
+
+1.在AndroidManifest.xml文件中添加一条写内存卡的权限即可
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>

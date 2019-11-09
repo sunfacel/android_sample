@@ -1,0 +1,245 @@
+ 本文主要讲述Android中的日期控件和时间控件的使用，以一个Demo的例子来展示日期和时间控件的使用，先看下如下效果图：
+
+从效果图中可以看到该Demo是通过单击【选择日期】按钮和【选择时间】按钮弹出日期或者时间的对话框，然后设置日期或者时间，设置完成后会在文本框中显示设置的日期或时间值。
+【1】Demo程序框架图：
+
+【2】布局文件 res/layout/main.xml 源码：
+[html] view plaincopy
+<?xml version="1.0" encoding="utf-8"?>  
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"  
+    android:orientation="vertical"  
+    android:layout_width="fill_parent"  
+    android:layout_height="fill_parent">  
+    <TextView   
+       android:layout_width="fill_parent" android:layout_height="wrap_content"   
+       android:gravity="center" android:text="欢迎关注Andy.Chen Blog" />   
+    <TextView   
+       android:layout_width="fill_parent" android:layout_height="wrap_content"   
+       android:gravity="center" android:text="日期和时间控件的使用DEMO" />    
+    
+    <LinearLayout android:orientation="horizontal"    
+       android:layout_width="fill_parent" android:layout_height="wrap_content">    
+  
+       <EditText android:id="@+id/showdate" android:layout_width="fill_parent"    
+           android:layout_height="wrap_content" android:layout_weight="1"/>    
+       <Button android:id="@+id/pickdate" android:layout_width="wrap_content"    
+           android:layout_height="wrap_content" android:text="选择日期"/>    
+    
+    </LinearLayout>   
+      
+    <LinearLayout android:orientation="horizontal"    
+       android:layout_width="fill_parent" android:layout_height="wrap_content">    
+  
+       <EditText android:id="@+id/showtime" android:layout_width="fill_parent"    
+           android:layout_height="wrap_content" android:layout_weight="1"/>    
+       <Button android:id="@+id/picktime" android:layout_width="wrap_content"    
+           android:layout_height="wrap_content" android:text="选择时间"/>    
+    
+    </LinearLayout>   
+</LinearLayout>  
+【3】包com.andyidea.calenderdemo下MainActivity.java源码：
+[html] view plaincopy
+package com.andyidea.calenderdemo;  
+  
+import java.util.Calendar;  
+  
+import android.app.Activity;  
+import android.app.DatePickerDialog;  
+import android.app.Dialog;  
+import android.app.TimePickerDialog;  
+import android.os.Bundle;  
+import android.os.Handler;  
+import android.os.Message;  
+import android.view.View;  
+import android.widget.Button;  
+import android.widget.DatePicker;  
+import android.widget.EditText;  
+import android.widget.TimePicker;  
+  
+public class MainActivity extends Activity {  
+      
+    private EditText showDate = null;  
+    private Button pickDate = null;  
+    private EditText showTime = null;  
+    private Button pickTime = null;  
+      
+    private static final int SHOW_DATAPICK = 0;   
+    private static final int DATE_DIALOG_ID = 1;    
+    private static final int SHOW_TIMEPICK = 2;  
+    private static final int TIME_DIALOG_ID = 3;  
+      
+    private int mYear;    
+    private int mMonth;  
+    private int mDay;   
+    private int mHour;  
+    private int mMinute;  
+      
+    /** Called when the activity is first created. */  
+    @Override  
+    public void onCreate(Bundle savedInstanceState) {  
+        super.onCreate(savedInstanceState);  
+        setContentView(R.layout.main);  
+          
+        initializeViews();  
+          
+        final Calendar c = Calendar.getInstance();  
+        mYear = c.get(Calendar.YEAR);    
+        mMonth = c.get(Calendar.MONTH);    
+        mDay = c.get(Calendar.DAY_OF_MONTH);  
+          
+        mHour = c.get(Calendar.HOUR_OF_DAY);  
+        mMinute = c.get(Calendar.MINUTE);  
+          
+        setDateTime();   
+        setTimeOfDay();  
+    }  
+      
+    /**  
+     * 初始化控件和UI视图  
+     */  
+    private void initializeViews(){  
+        showDate = (EditText) findViewById(R.id.showdate);    
+        pickDate = (Button) findViewById(R.id.pickdate);   
+        showTime = (EditText)findViewById(R.id.showtime);  
+        pickTime = (Button)findViewById(R.id.picktime);  
+          
+        pickDate.setOnClickListener(new View.OnClickListener() {  
+              
+            @Override  
+            public void onClick(View v) {  
+               Message msg = new Message();   
+               if (pickDate.equals((Button) v)) {    
+                  msg.what = MainActivity.SHOW_DATAPICK;    
+               }    
+               MainActivity.this.dateandtimeHandler.sendMessage(msg);   
+            }  
+        });  
+          
+        pickTime.setOnClickListener(new View.OnClickListener() {  
+              
+            @Override  
+            public void onClick(View v) {  
+               Message msg = new Message();   
+               if (pickTime.equals((Button) v)) {    
+                  msg.what = MainActivity.SHOW_TIMEPICK;    
+               }    
+               MainActivity.this.dateandtimeHandler.sendMessage(msg);   
+            }  
+        });  
+    }  
+  
+    /**  
+     * 设置日期  
+     */  
+    private void setDateTime(){  
+       final Calendar c = Calendar.getInstance();    
+         
+       mYear = c.get(Calendar.YEAR);    
+       mMonth = c.get(Calendar.MONTH);    
+       mDay = c.get(Calendar.DAY_OF_MONTH);   
+    
+       updateDateDisplay();   
+    }  
+      
+    /**  
+     * 更新日期显示  
+     */  
+    private void updateDateDisplay(){  
+       showDate.setText(new StringBuilder().append(mYear).append("-")  
+               .append((mMonth + 1) < 10 ? "0" + (mMonth + 1) : (mMonth + 1)).append("-")  
+               .append((mDay < 10) ? "0" + mDay : mDay));   
+    }  
+      
+    /**   
+     * 日期控件的事件   
+     */    
+    private DatePickerDialog.OnDateSetListener mDateSetListener = new DatePickerDialog.OnDateSetListener() {    
+    
+       public void onDateSet(DatePicker view, int year, int monthOfYear,    
+              int dayOfMonth) {    
+           mYear = year;    
+           mMonth = monthOfYear;    
+           mDay = dayOfMonth;    
+  
+           updateDateDisplay();  
+       }    
+    };   
+      
+    /**  
+     * 设置时间  
+     */  
+    private void setTimeOfDay(){  
+       final Calendar c = Calendar.getInstance();   
+       mHour = c.get(Calendar.HOUR_OF_DAY);  
+       mMinute = c.get(Calendar.MINUTE);  
+       updateTimeDisplay();  
+    }  
+      
+    /**  
+     * 更新时间显示  
+     */  
+    private void updateTimeDisplay(){  
+       showTime.setText(new StringBuilder().append(mHour).append(":")  
+               .append((mMinute < 10) ? "0" + mMinute : mMinute));   
+    }  
+      
+    /**  
+     * 时间控件事件  
+     */  
+    private TimePickerDialog.OnTimeSetListener mTimeSetListener = new TimePickerDialog.OnTimeSetListener() {  
+          
+        @Override  
+        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {  
+            mHour = hourOfDay;  
+            mMinute = minute;  
+              
+            updateTimeDisplay();  
+        }  
+    };  
+      
+    @Override    
+    protected Dialog onCreateDialog(int id) {    
+       switch (id) {    
+       case DATE_DIALOG_ID:    
+           return new DatePickerDialog(this, mDateSetListener, mYear, mMonth,    
+                  mDay);  
+       case TIME_DIALOG_ID:  
+           return new TimePickerDialog(this, mTimeSetListener, mHour, mMinute, true);  
+       }  
+             
+       return null;    
+    }    
+    
+    @Override    
+    protected void onPrepareDialog(int id, Dialog dialog) {    
+       switch (id) {    
+       case DATE_DIALOG_ID:    
+           ((DatePickerDialog) dialog).updateDate(mYear, mMonth, mDay);    
+           break;  
+       case TIME_DIALOG_ID:  
+           ((TimePickerDialog) dialog).updateTime(mHour, mMinute);  
+           break;  
+       }  
+    }    
+    
+    /**   
+     * 处理日期和时间控件的Handler   
+     */    
+    Handler dateandtimeHandler = new Handler() {  
+    
+       @Override    
+       public void handleMessage(Message msg) {    
+           switch (msg.what) {    
+           case MainActivity.SHOW_DATAPICK:    
+               showDialog(DATE_DIALOG_ID);    
+               break;   
+           case MainActivity.SHOW_TIMEPICK:  
+               showDialog(TIME_DIALOG_ID);  
+               break;  
+           }    
+       }    
+    
+    };   
+      
+}  
+【4】程序运行效果图：

@@ -1,0 +1,32 @@
+TextView 上显示的文字超过其最长限制的时候，要如何实现以下效果：
+
+values/styles.xml 
+
+<style name="AudioFileInfoOverlayText">   
+    <item name="android:paddingLeft">4px</item>   
+    <item name="android:paddingBottom">4px</item>   
+    <item name="android:textColor">#ffffffff</item>   
+    <item name="android:textSize">12sp</item>   
+    <item name="android:shadowColor">#ff00ff00</item>   
+    <item name="android:shadowDx">5</item>   
+    <item name="android:shadowDy">3</item>   
+    <item name="android:shadowRadius">6</item>   
+</style> 
+
+
+-------------
+
+<TextView android:id="@+id/info"   
+       android:layout_width="fill_parent"   
+       android:layout_height="wrap_content"   
+       style="@style/AudioFileInfoOverlayText"   
+       android:text="aaaa"   
+         android:gravity="center" />  
+
+
+.-----------------------------
+
+android:shadowColor指定文本阴影的颜色，需要与shadowRadius一起使用。 
+android:shadowDx设置阴影横向坐标开始位置。 
+android:shadowDy设置阴影纵向坐标开始位置。 
+android:shadowRadius设置阴影的半径。设置为0.1就变成字体的颜色了，一般设置为3.0的效果比较好。

@@ -1,0 +1,7 @@
+不知道大家有没有这个错，右键——>new——>Android Project——>Create project from existing source然后选择Sample下面的例子导入，会找不到R.java这个文件，同时也提示match_parent无效。
+        在网上找了一下，各有解释，经过试验，我发现可以这样做：
+1、第一次导入的时候Build Target选择其它版本的，底的不行就换高的，然后导入，你会发现仍然会提示match_parent无效，不要着急，看看你的R.java，是不是有了呢？
+2、删除你刚才导入的工程，注意：别把本地文件给删了。然后再导入，不过这次就要选择你打破如的例子所在的SDK了，例如我导入asamples\android-8里面的NotePad例子，就选择android 2.2版本，然后Finish，怎么样，是不是R.java有啦，match_parent也不会提示无效了？
+
+
+查了一下，match_parent是2.2版本才开始有的一个layout，所以在2.2版本之前的sdk中都会提示无效的！

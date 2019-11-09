@@ -1,0 +1,7 @@
+
+1、在activity_main.xml中定义好按钮
+   setContentView(R.layout.activity_main);加载这个xml文件
+
+2、clickHandle(View v)，用这个处理按钮的响应，View.getId()=R.id.XXX为按钮的值
+
+

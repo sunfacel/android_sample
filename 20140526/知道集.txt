@@ -1,0 +1,284 @@
+
+本帖最后由 popqq520 于 2012-9-29 17:00 编辑
+
+
+平时写代码积累下来的一些经常用到的小知识，希望对大家有帮助吧：
+（因为eoe有字数限制所以只能分两个帖子发布，大家多多见谅！）
+
+
+
+1、判断sd卡是否存在
+
+boolean sdCardExist = Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED);
+
+2、TextView部分文字设置颜色
+
+TextView tv = new TextView(this);
+//添加css样式
+tv.setText(Html.fromHtml("<font color="#ff0000">红色</font>其它颜色"));
+
+3、替换数据库某字段中某些字符的方法：
+
+update table set spell=replace(spell,'ɡ','g')
+
+4、单选按钮默认选中：
+
+mRadioGroup.check(mRadioButton_1.getId());
+
+下拉列表默认选中：
+
+for(int j = 0;j < cities.length;j ++){
+     if(months[j].equals("武汉")){
+         mSpinner_m.setSelection(j);
+     }
+}
+
+5、TextView中嵌套图片：
+
+Drawable draw = getResources().getDrawable(R.drawable.ji_dot_nor);
+textView.setCompoundDrawablesWithIntrinsicBounds(null, draw, null, null);  
+
+6、ListView去掉下拉条：
+
+方法一：在xml属性中设置
+
+android:scrollbars="none"
+方法二：在代码中设置：
+
+listView.setVerticalScrollBarEnabled(false);
+
+7、设置Activity的风格：
+
+//将Activity设置成半透明的效果
+android:theme="@android:style/Theme.Translucent"  
+//将Activity设置成对话框的样式  
+android:theme="@android:style/Theme.Dialog"  <span style="font-family: Arial, Helvetica, sans-serif; white-space: normal; ">  <wbr>  <wbr> </wbr></wbr></span>
+
+8、创建一个背景模糊的Widow，且将对话框放在前景
+
+Window window = dialog.getWindow();
+window.setFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND,WindowManager.LayoutParams.FLAG_BLUR_BEHIND);  
+
+9、list滚动时出现黑色底的问题:
+
+解决方法:
+方法一：
+在XML中设置android:cacheColorHint="#00000000"
+
+方法二：
+在代码中设置listView.setCacheColorHint(0);
+
+10、编辑框中指定输入的类型，设置属性digits即可：
+
+例：只允许输入数字
+android:digits="0123456789"  或  android:digits="integer"   或  android:digits="num"
+
+11、利用反射机制，获取drawable文件夹下的图片名称：
+
+Field[] fields = R.drawable.class.getDeclaredFields();
+for(Field field:fields){
+     if(!"icon".equals(field.getName())){
+         sb.append(field.getName() + "\t");
+     }
+}
+mTextView.setText(sb.toString());
+
+12、缓冲流播放MP3：
+
+MediaPlayer player = new MediaPlayer();
+try {
+     player.setDataSource(WebMusic.this, Uri.parse("http://stream15.a8.com/a8space/2010/12/30/2010123002225125942.mp3"));
+     player.prepare();
+     player.start();
+} catch (IllegalArgumentException e) {
+     e.printStackTrace();
+} catch (SecurityException e) {
+     e.printStackTrace();
+} catch (IllegalStateException e) {
+     e.printStackTrace();
+} catch (IOException e) {
+     e.printStackTrace();
+}
+
+13、下面的代码可以用来点亮屏幕：
+
+PowerManager pm = (PowerManager)getSystemService(POWER_SERVICE);
+mWakelock = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP |PowerManager.SCREEN_DIM_WAKE_LOCK, "SimpleTimer");
+mWakelock.acquire();
+...............
+mWakelock.release();
+
+下面的代码用来屏幕解锁：
+
+KeyguardManager keyguardManager = (KeyguardManager)getSystemService(KEYGUARD_SERVICE);
+KeyguardLock keyguardLock = keyguardManager.newKeyguardLock("");
+BkeyguardLock.disableKeyguard();
+
+使用这两段代码，需要在AndroidManifest文件中加入以下权限：
+
+<uses-permission android:name="android.permission.DISABLE_KEYGUARD"></uses-permission>
+<uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
+
+14、android 跑马灯效果做如下设置即可：
+
+android:scrollHorizontally="true"    
+android:marqueeRepeatLimit="marquee_forever"    
+android:ellipsize="marquee"    
+android:focusable="true"    
+android:focusableInTouchMode="true"    
+android:singleLine="true"
+
+15、拦截短信：
+     当android系统接收到短信时，会发送一个广播BroadcastReceiver，这个广播是以有序广播的形式发送的。
+     所谓的有序广播就是广播发出后，接收者是按照设置的优先级一个一个接着接收，前面的接收者可以选择是否终止这条广播以使后面的接收者接收不到，而普遍广播发送 后所有的接收者都能同时接到，但是不能终止这条广播，也不能将它的处理结果传递给下个接收者。
+     sms拦截就是通过实现一个BroadcastReceiver并将其的优先级设置的比系统sms接收者高。
+     android:priority就是设置优先级的，设置为100即可：
+
+  <receiver android:name="InterceptSMS">
+     <intent-filter android:priority="100">
+         <action android:name="android.provider.Telephony.SMS_RECEIVED"/>
+     </intent-filter>
+</receiver>
+
+16、如果在文件夹下选择视频文件时，想调用自己的播放器，需要在Manifest.xml中设置过滤器，设置如下：
+
+  <intent-filter>
+     <action android:name="android.intent.action.VIEW" />
+     <category android:name="android.intent.category.DEFAULT"/>
+     <data android:mimeType="video/*"/>
+</intent-filter>
+
+如果想在浏览器中调用自己的播放器，设置如下：
+
+<intent-filter>
+     <action android:name="android.intent.action.VIEW" />
+     <category android:name="android.intent.category.DEFAULT"/>
+     <category android:name="android.intent.category.BROWSABLE" />
+     <data android:mimeType="video/*" android:scheme="http"/>
+</intent-filter>
+
+
+
+如果两者都要实现的话，就必须配两个过滤器。
+
+17、显示图片时，用mImageView.setScaleType(ImageView.ScaleType.FIT_XY); 可以填充整个区域。
+
+18、保持屏幕长开：
+
+getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+开启、关闭屏幕时发送的广播：
+
+<receiver android:name=".MyBroadcastReceiver" android:enabled="true">                 
+     <intent-filter>                       
+         <action android:name="android.intent.action.ACTION_SCREEN_ON"></action>                           
+         <action android:name="android.intent.action.ACTION_SCREEN_OFF"></action>                 
+     </intent-filter>          
+</receiver>
+
+19、判断一个intent是否可用：
+
+public static boolean isIntentAvailable(Context context, String action) {
+     final PackageManager packageManager = context.getPackageManager();
+     final Intent intent = new Intent(action);
+     List<ResolveInfo> list = packageManager.queryIntentActivities(intent,PackageManager.MATCH_DEFAULT_ONLY);
+     return list.size() > 0;
+}  
+
+上述代码判断action的intent是否可用
+（备注，也可以得到相应intent的应用程序信息）
+
+我们可以根据scanAvailable 来判断是否让用户操作来发送该intent:
+
+boolean bool = isIntentAvailable(gallery.this,ACTION);
+if(bool){
+     Intent intent = new Intent(ACTION);
+     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+     startActivity(intent);
+}
+
+20、获取所有桌面应用的图标：
+
+private List<Drawable> getImage(){
+     PackageManager packageManager = this.getPackageManager();
+     Intent intent = new Intent(Intent.ACTION_MAIN);
+     intent.addCategory(Intent.CATEGORY_LAUNCHER);
+     List<ResolveInfo> infos = packageManager.queryIntentActivities(intent, 0);
+     for(ResolveInfo info : infos){
+         ActivityInfo ai = info.activityInfo;
+         Drawable icon = ai.loadIcon(packageManager);
+         list.add(icon);
+     }
+     return list;
+}
+
+21、Android 系统图片数据库：
+
+Uri STORAGE_URI = Images.Media.EXTERNAL_CONTENT_URI;
+
+往改数据库中插入数据，用到了内容提供者，大致如下：
+view plaincopy
+ContentValues values = new ContentValues(11);
+values.put(Images.Media.TITLE, title);
+values.put(Images.Media.DISPLAY_NAME, filename);
+values.put(Images.Media.DATE_TAKEN, dateTaken);
+values.put(Images.Media.DATE_MODIFIED, dateTaken);
+values.put(Images.Media.DATE_ADDED, dateAdded);
+values.put(Images.Media.MIME_TYPE, "image/jpeg");
+values.put(Images.Media.ORIENTATION, degree[0]);
+values.put(Images.Media.DATA, filePath);
+values.put(Images.Media.SIZE, size);
+values.put(Images.Media.LATITUDE, latitude.floatValue());
+values.put(Images.Media.LONGITUDE, longitude.floatValue());
+
+ContentResolver contentResolver = getContentResolver();
+contentResolver.insert(STORAGE_URI, values);
+
+//插入数据后刷新一下：
+getContentResolver().notifyChange(STORAGE_URI, null);
+
+22、获取UI控件的宽、高：
+
+在前面几个周期函数中都无法获取宽度和高度值，但在事件中或用定时器可以获取，如下：
+
+public void onCreate(Bundle savedInstanceState) {
+     super.onCreate(savedInstanceState);
+     setContentView(R.layout.main);
+         
+     text = (TextView) findViewById(R.id.text);
+     btn = (Button) findViewById(R.id.btn);       
+     btn.setOnClickListener(new Button.OnClickListener(){
+         @Override
+         public void onClick(View v) {
+             int width = text.getWidth();
+             int height = text.getHeight();
+             Log.i("Log: ", "----------->"+width + " | " + height);
+         }
+     });
+}
+
+23、判断某一服务是否在运行：
+
+//serviceName：即包名+服务的名称
+//return：某一服务正在运行，返回true，否则返回false
+public  boolean isRunning(Context c,String serviceName){
+     ActivityManager myAM=(ActivityManager)c.getSystemService(Context.ACTIVITY_SERVICE); 
+     ArrayList<RunningServiceInfo> runningServices = (ArrayList<RunningServiceInfo>)myAM.getRunningServices(40);
+     //获取最多40个当前正在运行的服务，放进ArrList里
+     for(int i = 0 ; i<runningServices.size();i++){  //循环枚举对比
+         if(runningServices.get(i).service.getClassName().toString().equals(serviceName)){
+             return true;
+         }
+     }
+     return false;
+}
+
+
+24、根据角度求正弦值：
+
+  Math.sin(Math.PI/2)
+
+   根据正弦值求角度:
+   Math.toDegrees(Math.asin(1.0))
+
+   其他求法同上

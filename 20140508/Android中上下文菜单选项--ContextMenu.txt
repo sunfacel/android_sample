@@ -1,0 +1,128 @@
+Android系统中的ContextMenu(上下文菜单)类似于PC中的右键弹出菜单，当一个视图注册到一个上下文菜单时，执行一个在该对象上的“长按”动作，将出现一个提供相关功能的浮动菜单。上下文菜单可以被注册到任何视图对象中，不过，最常见的是用于列表视图ListView的item，在按中列表项时，会转换其背景色而提示将呈现上下文菜单。 
+          注意：上下文菜单不支持图标和快捷键。
+         为了创建一个上下文菜单，你必须重写这个活动的上下文菜单回调函数：onCreateContextMenu() 和 onContextItemSelected()。在回调函数onCreateContextMenu()里，你可以通过使用一个add()方法来添加菜单项，或者通过扩充一个定义在XML中的菜单资源。然后，通过registerForContextMenu()为这个视图注册一个上下文菜单ContextMenu.  
+         下面我通过一个实例Demo来展示下ContextMenu的基本使用，通过手动添加Menu菜单和XML文件两种方式来配置Menu的选项。
+
+
+
+res/layout目录下的main.xml布局文件源码如下：
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+	<TextView  
+	    android:layout_width="fill_parent" 
+	    android:layout_height="wrap_content" 
+	    android:text="Hello,This is Andy's Blog!"/>
+	<ListView
+	    android:id="@+id/lv"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"/>
+</LinearLayout>
+
+res/menu目录下的 cmenu.xml 菜单选项文件源码如下：
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+  xmlns:android="http://schemas.android.com/apk/res/android">
+  <item android:id="@+id/add" android:title="增加"/>
+  <item android:id="@+id/update" android:title="更新"/>
+  <item android:id="@+id/delete" android:title="删除"/>
+</menu>
+
+com.andyidea.menudemo包下的 MenuActivity.java 源码如下：
+package com.andyidea.menudemo;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.Toast;
+
+public class MenuActivity extends Activity {
+	
+	ListView lv;
+	private ArrayAdapter<String> adapter;
+	private List<String> alist = new ArrayList<String>();
+	
+    /** Called when the activity is first created. */
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+        
+        lv = (ListView)findViewById(R.id.lv);
+        alist.add("第一");
+        alist.add("第二");
+        alist.add("第三");
+        adapter = new ArrayAdapter<String>(this,android.R.layout.simple_expandable_list_item_1,alist);
+        lv.setAdapter(adapter);
+        
+        //注册视图对象，即为ListView控件注册上下文菜单
+        registerForContextMenu(lv);
+    }
+
+    /**
+     * 创建上下文菜单选项
+     */
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v,
+			ContextMenuInfo menuInfo) {
+		
+		//1.通过手动添加来配置上下文菜单选项
+		//menu.add(0, 1, 0, "修改");
+		//menu.add(0, 2, 0, "删除");
+		
+		//2.通过xml文件来配置上下文菜单选项
+		MenuInflater mInflater = getMenuInflater();
+		mInflater.inflate(R.menu.cmenu, menu);
+		
+		super.onCreateContextMenu(menu, v, menuInfo);
+	}
+
+	/**
+	 * 当菜单某个选项被点击时调用该方法  
+	 */
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		switch(item.getItemId()){
+		case 1:
+			Toast.makeText(this, "你选择了手动修改", Toast.LENGTH_SHORT).show();
+			break;
+		case 2:
+			Toast.makeText(this, "你选择了手动删除", Toast.LENGTH_SHORT).show();
+			break;
+		case R.id.add:
+			Toast.makeText(this, "你选择了XML增加", Toast.LENGTH_SHORT).show();
+			break;
+		case R.id.update:
+			Toast.makeText(this, "你选择了XML更新", Toast.LENGTH_SHORT).show();
+			break;
+		case R.id.delete:
+			Toast.makeText(this, "你选择了XML删除", Toast.LENGTH_SHORT).show();
+			break;
+		}
+		return super.onContextItemSelected(item);
+	}
+
+	/**
+	 * 当上下文菜单关闭时调用的方法  
+	 */
+	@Override
+	public void onContextMenuClosed(Menu menu) {
+		// TODO Auto-generated method stub
+		super.onContextMenuClosed(menu);
+	}
+    
+}
+

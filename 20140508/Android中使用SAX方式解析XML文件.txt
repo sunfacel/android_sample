@@ -1,0 +1,226 @@
+  在Android中解析XML文主要有三种方式，分别为Simple API for XML(SAX)、Document Object Model(DOM)和Android附带的pull解析器。在本篇文章中主要采用例子说明使用SAX方式解析XML文件。
+         SAX是一个解析速度非常快并且占用内存少的XML解析器，非常适合Android等移动设备。SAX解析XML文件采用事件驱动的方式进行，也就是说SAX是逐行扫描文件，遇到符合条件的设定条件后就会触发特定的事件，回调你写好的事件处理程序。
+         SAX的优势在于其解析速度较快，占用内存较少(相对于DOM而言)。而且SAX在解析文件的过程中得到自己需要的信息后可以随时终止解析，并不一定要等文件全部解析完毕。   
+SAX的回调事件定义在ContentHandler接口中，下面是一些ContentHandler接口常用的方法：
+startDocument()
+当遇到文档的开头的时候，调用这个方法，可以在其中做一些预处理的工作。
+endDocument()
+和上面的方法相对应，当文档结束的时候，调用这个方法，可以在其中做一些善后的工作。
+startElement(String namespaceURI, String localName, String qName, Attributes atts)
+当读到一个开始标签的时候，会触发这个方法。namespaceURI就是命名空间，localName是不带命名空间前缀的标签名，qName是带命名空间前缀的标签名。通过atts可以得到所有的属性名和相应的值。要注意的是SAX中一个重要的特点就是它的流式处理，当遇到一个标签的时候，它并不会纪录下以前所碰到的标签，也就是说，在startElement()方法中，所有你所知道的信息，就是标签的名字和属性，至于标签的嵌套结构，上层标签的名字，是否有子元属等等其它与结构相关的信息，都是不得而知的，都需要你的程序来完成。这使得SAX在编程处理上没有DOM来得那么方便。
+endElement(String uri, String localName, String name)
+这个方法和上面的方法相对应，在遇到结束标签的时候，调用这个方法。
+characters(char[] ch, int start, int length)
+这个方法用来处理在XML文件中读到的内容，第一个参数为文件的字符串内容，后面两个参数是读到的字符串在这个数组中的起始位置和长度，使用new String(ch,start,length)就可以获取内容。
+我们先看下工程的目录结构如下：
+
+按以下步骤进行操作：
+[1] 新建一个XML文件，命名为student01.xml。同时把XML文件放置到assets目录下。student01.xml文件的内容如下：
+[html] view plaincopy
+<?xml version="1.0" encoding="utf-8"?>  
+<students>  
+    <student id="20110806100">  
+        <name>小明</name>  
+        <age>22</age>  
+        <sex>男</sex>  
+    </student>  
+    <student id="20110806101">  
+        <name>小李</name>  
+        <age>24</age>  
+        <sex>男</sex>  
+    </student>  
+    <student id="20110806102">  
+        <name>小丽</name>  
+        <age>21</age>  
+        <sex>女</sex>  
+    </student>  
+</students>  
+[2] 根据XML文件中的节点目录，创建一个相对应的实体类，来保存解析的相应信息。在包：com.andyidea.entity下新建Student.java类。
+[html] view plaincopy
+package com.andyidea.entity;  
+  
+public class Student {  
+      
+    private String id;  
+    private String name;  
+    private int age;  
+    private String sex;  
+      
+    public String getId() {  
+        return id;  
+    }  
+    public void setId(String id) {  
+        this.id = id;  
+    }  
+    public String getName() {  
+        return name;  
+    }  
+    public void setName(String name) {  
+        this.name = name;  
+    }  
+    public int getAge() {  
+        return age;  
+    }  
+    public void setAge(int age) {  
+        this.age = age;  
+    }  
+    public String getSex() {  
+        return sex;  
+    }  
+    public void setSex(String sex) {  
+        this.sex = sex;  
+    }  
+  
+}  
+[3] 创建了一个用来解析XML文件的类，该类继承自DefaultHandler。在包：com.andyidea.util创建XMLContentHandler.java类【注：DefaultHandler默认实现了ContentHandler接口】
+[html] view plaincopy
+package com.andyidea.util;  
+  
+import java.util.ArrayList;  
+import java.util.List;  
+  
+import org.xml.sax.Attributes;  
+import org.xml.sax.SAXException;  
+import org.xml.sax.helpers.DefaultHandler;  
+  
+import com.andyidea.entity.Student;  
+  
+public class XMLContentHandler extends DefaultHandler {  
+      
+    private List<Student> students = null;  
+         private Student mStudent;  
+         private String tagName = null;  
+  
+         public List<Student> getStudents() {  
+             return students;  
+         }  
+  
+    @Override  
+    public void startDocument() throws SAXException {  
+        students = new ArrayList<Student>();  
+    }  
+  
+    @Override  
+    public void endDocument() throws SAXException {  
+        // TODO Auto-generated method stub  
+        super.endDocument();  
+    }  
+  
+    @Override  
+    public void startElement(String uri, String localName, String qName,  
+            Attributes atts) throws SAXException {  
+        if(localName.equals("student")){  
+            mStudent = new Student();  
+            mStudent.setId(atts.getValue("id"));  
+        }  
+        this.tagName = localName;  
+    }  
+  
+    @Override  
+    public void endElement(String uri, String localName, String qName)  
+            throws SAXException {  
+        if(localName.equals("student")){  
+            students.add(mStudent);  
+            mStudent = null;  
+        }  
+        this.tagName = null;  
+    }  
+  
+    @Override  
+    public void characters(char[] ch, int start, int length)  
+            throws SAXException {  
+        if (tagName != null) {  
+            String data = new String(ch, start, length);  
+  
+            if (tagName.equals("name")) {  
+                   this.mStudent.setName(data);  
+            } else if (tagName.equals("sex")) {  
+                   this.mStudent.setSex(data);  
+            } else if (tagName.equals("age")) {  
+                   this.mStudent.setAge(Integer.parseInt(data));  
+            }  
+        }  
+      }  
+  
+}  
+[4] 定义一个使用SAX解析XML文件的工具类：ParserBySAX.java。在该类中我们定义了一个parseXML(InputStream input)方法，该方法接收一个输入流，并创建了SAX解析器工厂以及SAXParse的实例。
+[html] view plaincopy
+package com.andyidea.util;  
+  
+import java.io.IOException;  
+import java.io.InputStream;  
+import java.util.List;  
+  
+import javax.xml.parsers.ParserConfigurationException;  
+import javax.xml.parsers.SAXParser;  
+import javax.xml.parsers.SAXParserFactory;  
+  
+import org.xml.sax.SAXException;  
+  
+import com.andyidea.entity.Student;  
+  
+public class ParserBySAX {  
+  
+    public static List<Student> parseXML(InputStream input) {  
+  
+        try {  
+           SAXParserFactory factory = SAXParserFactory.newInstance();  
+           SAXParser parser = factory.newSAXParser();  
+           XMLContentHandler handler = new XMLContentHandler();  
+           parser.parse(input, handler);  
+           input.close();  
+           return handler.getStudents();  
+  
+        } catch (ParserConfigurationException e) {  
+           e.printStackTrace();  
+        } catch (SAXException e) {  
+           e.printStackTrace();  
+        } catch (IOException e) {  
+           e.printStackTrace();  
+        }  
+  
+        return null;  
+    }  
+}  
+
+[5] 该Demo的入口类：MainActivity.java
+[html] view plaincopy
+package com.andyidea.xmlparser;  
+  
+import java.io.IOException;  
+import java.io.InputStream;  
+import java.util.List;  
+  
+import com.andyidea.entity.Student;  
+import com.andyidea.util.ParserBySAX;  
+  
+import android.app.Activity;  
+import android.content.res.AssetManager;  
+import android.os.Bundle;  
+import android.util.Log;  
+  
+public class MainActivity extends Activity {  
+    /** Called when the activity is first created. */  
+    @Override  
+    public void onCreate(Bundle savedInstanceState) {  
+        super.onCreate(savedInstanceState);  
+        setContentView(R.layout.main);  
+  
+        AssetManager asset = getAssets();  
+        try {  
+            InputStream input = asset.open("student01.xml");  
+            List<Student> list = ParserBySAX.parseXML(input);  
+            for (Student stu : list) {  
+                   Log.e("StudentInfo","Person ID: " + stu.getId() + ","  
+                         + stu.getName() + ", " + stu.getAge() + ", "  
+                         + stu.getSex());  
+            }  
+        } catch (IOException e) {  
+            e.printStackTrace();  
+        }  
+    }  
+}  
+
+[6]最后我们运行程序看看结果如下：
+
+注：黑色方框中显示的内容就是解析XML的结果。

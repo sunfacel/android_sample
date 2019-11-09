@@ -1,0 +1,38 @@
+1. 相关文件夹介绍
+     在Android项目文件夹里面，主要的资源文件是放在res文件夹里面的。assets文件夹是存放不进行编译加工的原生文件，即该文件夹里面的文件不会像xml，java文件被预编译，可以存放一些图片，html，js, css等文件。在后面会介绍如何读取assets文件夹的资源！
+     res文件夹里面的多个文件夹的各自介绍(来自网上的Android开发指南中文版内容)：
+
+1.1、res/anim/    XML文件，它们被编译进逐帧动画（frame by frame animation）或补间动画(tweened animation)对象
+
+1.2、res/drawable/    .png、.9.png、.jpg文件，它们被编译进以下的Drawable资源子类型中：
+		要获得这种类型的一个资源，可以使用Resource.getDrawable(id)位图文件9-patches（可变尺寸的位图）
+为了获取资源类型，使用mContext.getResources().getDrawable(R.drawable.imageId)
+
+注意：放在这里的图像资源可能会被aapt工具自动地进行无损压缩优化。比如，一个真彩色但并不需要256色的PNG可能会被转换为一个带调色板的8位PNG。这使得同等质量的图片占用更少的资源。所以我们得意识到这些放在该目录下的二进制图像在生成时可能会发生变化。如果你想读取一个图像位流并转换成一个位图(bitmap)，请把图像文件放在res/raw/目录下，这样可以避免被自动优化。
+
+1.3、res/layout/ 被编译为屏幕布局(或屏幕的一部分)的XML文件。参见布局声明(Declaring Layout)
+
+1.4、res/values/   可以被编译成很多种类型的资源的XML文件。
+注意: 不像其他的res/文件夹，它可以保存任意数量的文件，这些文件保存了要创建资源的描述，而不是资源本身。XML元素类型控制这些资源应该放在R类的什么地方。
+
+尽管这个文件夹里的文件可以任意命名，不过下面使一些比较典型的文件（文件命名的惯例是将元素类型包含在该名称之中）：
+      array.xml 定义数组
+     colors.xml 定义color drawable和颜色的字符串值(color string values)。使用Resource.getDrawable()和Resources.getColor()分别获得这些资源。
+     dimens.xml定义尺寸值(dimension value)。使用Resources.getDimension()获得这些资源。
+      strings.xml定义字符串(string)值。使用Resources.getString()或者Resources.getText()获取这些资源。getText()会保留在UI字符串上应用的丰富的文本样式。
+      styles.xml 定义样式(style)对象。
+
+1.5、res/xml/ 任意的XML文件，在运行时可以通过调用Resources.getXML()读取。
+
+1.6、res/raw/  直接复制到设备中的任意文件。它们无需编译，添加到你的应用程序编译产生的压缩文件中。要使用这些资源，可以调用Resources.openRawResource()，参数是资源的ID，即R.raw.somefilename。
+--------------------------------
+
+
+2.自动生成的R class
+     在项目文件夹的gen文件夹里面有个R.java，我们平常引用的资源主要引用这个类的变量。
+ 
+     注意：R类是自动生成的，并且它不能被手动修改。当资源发生变动时，它会自动修改。
+
+
+
+

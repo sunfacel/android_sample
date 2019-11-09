@@ -1,0 +1,62 @@
+layer-list可以将多个图片按照顺序层叠起来。 
+语法：在drawalbe/drawable-layer.xml中 
+[html] view plaincopy
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">  
+    <item android:drawable="@android:color/white" />  
+    <item android:drawable="@drawable/logo_overlay" />  
+</layer-list>  
+
+使用方式像其他图片一样： 
+如在样式中引用： 
+[html] view plaincopy
+<resources>  
+    <style name="LookupTheme" parent="@android:style/Theme.Light.NoTitleBar">  
+        <item name="android:windowBackground">@drawable/drawable-layer</item>  
+    </style>  
+</resources>  
+在java代码中引用： 
+((ImageView) findViewById(R.id.imageview)).setImageDrawable(getResources().getDrawable(R.drawable.drawable-layer) 
+
+在代码中实现： 
+[java] view plaincopy
+Resources resources = getResources();   
+Drawable[] layers = new Drawable[2];   
+layers[0] = r.getDrawable(R.drawable.white);   
+layers[1] = r.getDrawable(R.drawable.logo_overlay);   
+LayerDrawable layerDrawable = new LayerDrawable(layers)  
+((ImageView) findViewById(R.id.imageview)).setImageDrawable(layerDrawable);   
+
+
+再举一个例子： 
+要用2张图片叠加起来，看上去形成一张图片 
+
+
+
+首先创建一个drawalbe/login_head.xml的文件，内容如下： 
+[html] view plaincopy
+<?xml version="1.0" encoding="UTF-8"?>  
+<layer-list  
+  xmlns:android="http://schemas.android.com/apk/res/android">  
+    <item android:id="@+id/user_faceback_drawable" android:drawable="@drawable/faceback" />  
+    <item android:id="@+id/user_face_drawable" android:drawable="@drawable/h001" android:left="10.0dip" android:top="18.0dip" android:right="25.0dip" android:bottom="35.0dip" />  
+</layer-list>  
+
+然后就可以使用这个组合的图片了，比如在ImageView中显示： 
+<ImageView android:id="@+id/faceImg" android:background="@drawable/login_head" 
+android:layout_width="wrap_content" android:layout_height="wrap_content" /> 
+
+使用java代码： 
+如何使多个Drawable叠加（合成图片）？ 
+大家可能知道Bitmap的叠加处理在Android平台中可以通过Canvas一层一层的画就行了，而Drawable中如何处理呢? 除了使用BitmapDrawable的getBitmap方法将Drawable转换为Bitmap外，今天Android123给大家说下好用简单的LayerDrawable类，LayerDrawable顾名思义就是层图形对象。下面直接用一个简单的代码表示: 
+[java] view plaincopy
+Bitmap bm = BitmapFactory.decodeResource(getResources(),R.drawable.cwj);    
+    Drawable[] array = new Drawable[3];    
+     array[0] = new PaintDrawable(Color.BLACK); //黑色    
+     array[1] = new PaintDrawable(Color.WHITE); //白色       
+     array[2] = new BitmapDrawable(bm); //位图资源            
+    LayerDrawable ld = new LayerDrawable(array); //参数为上面的Drawable数组    
+    ld.setLayerInset(1, 1, 1, 1, 1);  //第一个参数1代表数组的第二个元素，为白色    
+    ld.setLayerInset(2, 2, 2, 2, 2); //第一个参数2代表数组的第三个元素，为位图资源    
+    mImageView.setImageDrawable(ld);   
+
+上面的方法中LayerDrawable是关键，setLayerInset方法原型为public void setLayerInset (int index, int l, int t, int r, int b) 其中第一个参数为层的索引号，后面的四个参数分别为left、top、right和bottom。对于简单的图片合成我们可以将第一和第二层的PaintDrawable换成BitmapDrawable即可实现简单的图片合成。

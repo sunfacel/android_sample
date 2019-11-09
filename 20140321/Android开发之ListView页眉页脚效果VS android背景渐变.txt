@@ -1,0 +1,72 @@
+
+
+
+调用ListView的addFooterView()方法给List增加一个页脚时，如果列表内容很多，超过了屏幕大小，那么页脚就看不到了，可我们一般想要的效果是如下图所示的，在ListView的内容超过屏幕时，页脚还在屏幕的底部。 
+本文将介绍上图所示的ListView效果，同时介绍一下在android中如何实现渐变效果，就像上图中的页眉页脚的背景色一样。
+
+
+实现上面的效果主要使用几个RelativeLayout标签和ListView组合即可
+
+<?xml version="1.0" encoding="utf-8"?>  
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"  
+    android:orientation="vertical" android:layout_width="fill_parent"  
+    android:layout_height="fill_parent">  
+    <RelativeLayout android:id="@+id/listHeader"  
+        android:background="@drawable/jbshape" android:layout_alignParentTop="true"  
+        android:gravity="center_horizontal" android:layout_width="fill_parent"  
+        android:layout_height="wrap_content">  
+        <TextView android:text="IdeasAndroid 列表演示" android:textColor="#000000"  
+            android:textSize="18dip" android:layout_width="wrap_content"  
+            android:layout_height="wrap_content"></TextView>  
+    </RelativeLayout>  
+    <RelativeLayout android:id="@+id/listFooter"  
+        android:background="@drawable/jbshape" android:gravity="center_horizontal"  
+        android:layout_alignParentBottom="true" android:layout_width="fill_parent"  
+        android:layout_height="wrap_content">  
+        <Button android:id="@+id/prePage" android:layout_width="wrap_content"  
+            android:layout_height="wrap_content" android:text="上一页"  
+            android:layout_alignParentLeft="true"></Button>  
+        <Button android:layout_width="wrap_content"  
+            android:layout_gravity="right" android:layout_height="wrap_content"  
+            android:text="下一页" android:layout_toRightOf="@id/prePage"></Button>  
+    </RelativeLayout>  
+    <ListView android:id="@+id/myListView" android:layout_width="fill_parent"  
+        android:layout_height="fill_parent" android:layout_below="@id/listHeader"  
+        android:layout_above="@id/listFooter">  
+    </ListView>  
+</RelativeLayout>  
+
+
+几个关键点：
+1、在页眉（id为listHeader）使用属性android:layout_alignParentTop=”true”
+声明页眉部分与父视图的顶部对齐。
+2、在页脚（id为listFooter）使用属性android:layout_alignParentBottom=”true” 声明其与父视图的底部对齐。
+3、在 ListView中使用属性android:layout_below=”@id/listHeader” android:layout_above=”@id/listFooter” 声明ListView位于listHeader的下方，位于listFooter的上方。
+
+
+------------------------------------------------------------
+
+
+再来看看是怎么实现渐变的？
+
+我们在res/drawable目录下新建一个叫jbshape.xml的文件，内容如下所示：
+
+<?xml version="1.0" encoding="utf-8"?>  
+<shape xmlns:android="http://schemas.android.com/apk/res/android"  
+    android:shape="rectangle">  
+    <gradient android:startColor="#509245" android:centerColor="#3e8532"  
+        android:endColor="#509245" android:type="linear" android:angle="90"  
+        android:centerX="0.5" android:centerY="0.5" />  
+    <padding android:left="7dp" android:top="7dp" android:right="7dp"  
+        android:bottom="7dp" />  
+    <corners android:radius="4dp" />  
+</shape>  
+
+
+这里就不多讲了，相信你一看就能看懂，android:shape 配置的是图形的形式，主要包括方形、圆形等，本例中为方形。gradient节点主要配置起点颜色、终点颜色、中间点的坐标、中间点的颜色、渐变角度（90度为上下渐变，0为左右渐变），padding节点主要配置上下左右边距，corners节点配置四周园角的半径。更详细的配置参见http://www.ideasandroid.com/android/sdk/docs/guide/topics/resources/drawable-resource.html 。
+
+使用渐变就更简单了，如第一部分代码中所示的，直接用android:background=”@drawable/jbshape” 配置背景为刚才配置的渐变图形即可。
+
+好了，本文就介绍到这。如果还有不明白的地方请下载下面的代码，然后在本地测试一下就明白了。
+
+代码下载：http://www.ideasandroid.com/android/demo/HeaderBottomListDemo.rar

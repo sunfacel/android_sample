@@ -1,0 +1,426 @@
+大家可能遇到过跟小马一样的问题，就是在项目中不给Activity添加动画感觉好烂，特此，小马找个时间学习下Activity跳转时添加动画，网上资料一堆，但有些讲的是错的，而且只有文字没有效果，不如自己来，顺带试下什么效果，这个工程里面小马收集了一些常用的动画文件在工程目录anim下（我都加了注释，大家可以直接用），至于动画标签里面的属性大家可以参考如下路径的官方文档：太全了，有些还可以直接使用的...安卓伟滴太大了....developers/Dev Guide/Application Resources/Resources Type/Animation 风格一如既往，先看效果 ，再看代码，大家看类短，但一定仔细读下小马注释部分，读完了我保证你肯定不会晕Activity之间的动画了，小马先讲下，今天的测试主要是三个Activity，详细结构大家直接看工程结构图就明白了，看效果（工具做的GIF有点失真，但真机上绝对流畅）：
+
+
+第一个Activity控制类代码如下，大家主要看这个类，另外两个类，小马只贴下代码，没加注释，因为基本一样，只是改了下动画资源：
+
+package com.xiaoma.betweenactivityanimation; 
+ 
+import android.app.Activity; 
+import android.content.Intent; 
+import android.os.Bundle; 
+import android.view.View; 
+import android.view.View.OnClickListener; 
+ 
+/**   
+* @Title: BetweenActivityAnimationDemoActivity.java 
+* @Package com.xiaoma.betweenactivityanimation 
+* @Description: Activity之间跳转动画学习  如果怕动画太短看不清楚的， 
+* 可以把动画XML文件里面标签属性 during值设置的长些，吼吼 
+* @author XiaoMa 
+*/ 
+public class BetweenActivityAnimationDemoActivity extends Activity implements 
+        OnClickListener { 
+    /** Called when the activity is first created. */ 
+    @Override 
+    public void onCreate(Bundle savedInstanceState) { 
+        super.onCreate(savedInstanceState); 
+        setContentView(R.layout.main); 
+        init(); 
+    } 
+ 
+    private void init() { 
+        findViewById(R.id.button1).setOnClickListener(this); 
+    } 
+ 
+    @Override 
+    public void onClick(View v) { 
+        if (v.getId() == R.id.button1) { 
+            Intent intent = new Intent(getApplicationContext(), 
+                    BetweenActivityAnimationDemoActivity2.class); 
+            startActivity(intent); 
+             
+            /** 
+             * 对下面这个方法的官方解释如下，版本从2.0后开始哦 
+             * Call immediately after one of the flavors of startActivity(Intent) or finish()  
+             * to specify an explicit transition animation to perform next. 
+             * 用工具查到解释为： 
+             *   在startActivity(Intent)或finish()之法之后调用后，会立即用一个指定的描述动画的XML文件来执行 
+             *   下一个Activity  
+             *  
+             * 下面两句是对这个方法两个参数的解释,在此之前小马也看了下别人讲的， 
+             * 其实是错的，看官方的解释肯定没错，不懂英语的用工具查下 
+             * 小马一直都说的，我英语很烂，我能查的你一定也能查得到 
+             * 1.enterAnim  A resource ID of the animation resource  
+             *              to use for the incoming activity. Use 0 for no animation. 
+             * 2.exitAnim   A resource ID of the animation resource  
+             *              to use for the outgoing activity. Use 0 for no animation. 
+             * 一：进入动画  一个动画资源，用于目标Activity 进入屏幕时的动画，此处写0代表无动画 
+             * 二：退出动画  一个动画资源，用于当前Activity 退出屏幕时的动画，此处写0代表无动画 
+             *  
+             * 这个目标、当前怎么理解？比如：startActivity( A（当前）--> B（目标）) 《finish()一样》 
+             * 下面参数中有一个为0，就表示A退出时无动画...一定把参数搞清楚，不然动画就搞晕了 
+             * overridePendingTransition(R.anim.zoom_enter, 0);   
+             * 方法两个参数与目标、当前Activity对应关系如效果下方绿色图所示 
+             */ 
+            overridePendingTransition(R.anim.zoom_enter, R.anim.zoom_exit); 
+        } 
+    } 
+     
+    /** 列几个安卓自带的动画效果，大家可以把上面 overridePendingTransition参数改下看看效果 
+     *  实现淡入淡出的效果 
+        overridePendingTransition(android.R.anim.fade_in,android.R.anim.fade_out);     
+        overridePendingTransition(android.R.anim.fade_in,android.R.anim.fade_out); 
+          
+        由左向右滑入的效果 
+        overridePendingTransition(android.R.anim.slide_in_left,android.R.anim.slide_out_right);     
+        overridePendingTransition(android.R.anim.slide_in_left,android.R.anim.slide_out_right); 
+     */ 
+} 
+
+---------------------------------------------------
+
+第二个Activity代码如下：
+
+package com.xiaoma.betweenactivityanimation; 
+ 
+import android.app.Activity; 
+import android.content.Intent; 
+import android.os.Bundle; 
+import android.view.View; 
+import android.view.View.OnClickListener; 
+ 
+public class BetweenActivityAnimationDemoActivity2 extends Activity implements OnClickListener{ 
+    /** Called when the activity is first created. */ 
+    @Override 
+    public void onCreate(Bundle savedInstanceState) { 
+        super.onCreate(savedInstanceState); 
+        setContentView(R.layout.main2); 
+        init(); 
+    } 
+ 
+    private void init(){ 
+        findViewById(R.id.button2).setOnClickListener(this); 
+    } 
+     
+    @Override 
+    public void onClick(View v) { 
+        if(v.getId() == R.id.button2){ 
+            Intent i = new Intent(getApplicationContext(),BetweenActivityAnimationDemoActivity3.class); 
+            startActivity(i); 
+            overridePendingTransition(R.anim.hyperspace_in, R.anim.hyperspace_out); 
+        } 
+         
+    } 
+} 
+第三个Activity代码如下：
+package com.xiaoma.betweenactivityanimation; 
+ 
+import android.app.Activity; 
+import android.os.Bundle; 
+import android.view.View; 
+import android.view.View.OnClickListener; 
+ 
+public class BetweenActivityAnimationDemoActivity3 extends Activity implements OnClickListener { 
+    @Override 
+    public void onCreate(Bundle savedInstanceState) { 
+        super.onCreate(savedInstanceState); 
+        setContentView(R.layout.main3); 
+        init(); 
+    } 
+     
+    private void init(){ 
+        findViewById(R.id.button3).setOnClickListener(this); 
+    } 
+ 
+    @Override 
+    public void onClick(View v) { 
+        if(v.getId() == R.id.button3) 
+        { 
+            finish(); 
+            //如果这个地方不想用自己的，可以直接调安卓提供的动画，如下： 
+            overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out); 
+             
+            //安卓自带的动画哦，看效果就知道了 
+            //overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out); 
+             
+        } 
+         
+    } 
+     
+} 
+
+
+
+<?xml version="1.0" encoding="utf-8"?> 
+<!-- zoom_exit,即类似iphone的进入效果 --> 
+<set xmlns:android="http://schemas.android.com/apk/res/android" 
+        android:interpolator="@android:anim/decelerate_interpolator" 
+        android:zAdjustment="top"> 
+    <scale android:fromXScale="1.0" android:toXScale=".5" 
+           android:fromYScale="1.0" android:toYScale=".5" 
+           android:pivotX="50%p" android:pivotY="50%p" 
+           android:duration="3000" /> 
+    <alpha android:fromAlpha="1.0" android:toAlpha="0" 
+            android:duration="1000"/> 
+</set> 
+ 
+<!-- 实现zoom_enter即类似iphone退出时的效果 --> 
+<?xml version="1.0" encoding="utf-8"?> 
+<set xmlns:android="http://schemas.android.com/apk/res/android" 
+        android:interpolator="@android:anim/decelerate_interpolator"> 
+    <scale android:fromXScale="2.0" android:toXScale="1.0" 
+           android:fromYScale="2.0" android:toYScale="1.0" 
+           android:pivotX="50%p" android:pivotY="50%p" 
+           android:duration="1000" 
+           /> 
+</set> 
+ 
+<!-- hyperspace_in 浮动式动画 --> 
+<?xml version="1.0" encoding="utf-8"?> 
+<alpha xmlns:android="http://schemas.android.com/apk/res/android" 
+    android:duration="300" 
+    android:fromAlpha="0.0" 
+    android:startOffset="1200" 
+    android:toAlpha="1.0" /> 
+ 
+    <!--hyperspace_out 浮动式动画 --> 
+    <?xml version="1.0" encoding="utf-8"?> 
+<set xmlns:android="http://schemas.android.com/apk/res/android" android:shareInterpolator="false">   
+    <scale    
+        android:interpolator="@android:anim/accelerate_decelerate_interpolator"   
+        android:fromXScale="1.0"    
+        android:toXScale="1.4"    
+        android:fromYScale="1.0"    
+        android:toYScale="0.6"    
+        android:pivotX="50%"   
+        android:pivotY="50%"   
+        android:fillAfter="false"   
+        android:duration="700" />   
+    <set    
+        android:interpolator="@android:anim/accelerate_interpolator"   
+                android:startOffset="700">   
+           
+        <scale   
+            android:fromXScale="1.4"    
+            android:toXScale="0.0"   
+                android:fromYScale="0.6"   
+            android:toYScale="0.0"    
+            android:pivotX="50%"    
+            android:pivotY="50%"    
+            android:duration="400" />   
+           
+        <rotate    
+            android:fromDegrees="0"    
+            android:toDegrees="-45"   
+            android:toYScale="0.0"    
+            android:pivotX="50%"    
+            android:pivotY="50%"   
+            android:duration="400" />   
+    </set>   
+</set>  
+ 
+<!-- push_up_in 上下滑入式 --> 
+<?xml version="1.0" encoding="utf-8"?> 
+<set xmlns:android="http://schemas.android.com/apk/res/android" > 
+ 
+    <translate 
+        android:duration="300" 
+        android:fromYDelta="100%p" 
+        android:toYDelta="0" /> 
+ 
+    <alpha 
+        android:duration="300" 
+        android:fromAlpha="0.0" 
+        android:toAlpha="1.0" /> 
+ 
+</set> 
+ 
+<!-- push_up_out 上下滑入式 --> 
+<?xml version="1.0" encoding="utf-8"?> 
+<set xmlns:android="http://schemas.android.com/apk/res/android" > 
+ 
+    <translate 
+        android:duration="300" 
+        android:fromYDelta="0" 
+        android:toYDelta="-100%p" /> 
+ 
+    <alpha 
+        android:duration="300" 
+        android:fromAlpha="1.0" 
+        android:toAlpha="0.0" /> 
+ 
+</set> 
+
+
+
+---------------------------------------------------------
+
+package com.xiaoma.www;   
+   
+import android.animation.Animator;   
+import android.animation.AnimatorListenerAdapter;   
+import android.animation.ObjectAnimator;   
+import android.app.Activity;   
+import android.os.Bundle;   
+import android.view.View;   
+import android.view.View.OnClickListener;   
+import android.view.animation.AccelerateInterpolator;   
+import android.view.animation.CycleInterpolator;   
+import android.view.animation.DecelerateInterpolator;   
+import android.view.animation.Interpolator;   
+import android.view.animation.OvershootInterpolator;   
+import android.widget.ArrayAdapter;   
+import android.widget.Button;   
+import android.widget.ListView;   
+   
+/**    
+* @Title: BetweenAnimationActivity.java  
+* @Package com.xiaoma.www  
+* @Description: 小马学习模仿iPhone列表分页旋转刷新  
+* @author XiaoMa  
+*/   
+   
+public class BetweenAnimationActivity extends Activity implements OnClickListener {   
+       
+    /**资源声明*/   
+    private Button startNext = null ;    
+    private ListView firstPage = null ;   
+    private ListView secondPage = null ;   
+       
+    /**列表项声明*/   
+    private static final String firstItem[] =    
+        {"海阔人生","光辉岁月","无尽空虚","真的爱你","岁月无声","灰色轨迹","再见理想"};   
+       
+    private static final String secondItem[] =    
+        {"洗唰唰","爱啦啦","喜欢你","娃哈哈","小马果","大坏蛋","冷雨夜"};   
+       
+    /**列表页面切换动画插值器声明一*/   
+    private Interpolator accelerator = new AccelerateInterpolator();   
+    private Interpolator decelerator = new DecelerateInterpolator();   
+       
+    /**动画插值器二：效果五与效果六都为以下插值器*/   
+    private Interpolator  accelerator1= new  CycleInterpolator(45f);   
+    private Interpolator  decelerator1= new  OvershootInterpolator();   
+       
+    /** Called when the activity is first created. */   
+    @Override   
+    public void onCreate(Bundle savedInstanceState) {   
+        super.onCreate(savedInstanceState);   
+        setContentView(R.layout.main);   
+           
+        /**  
+         * 这个地方写下，大家尽量不要在onCreate方法中写太多的操作，  
+         * 如果涉及到很多配置问题时有些属性设置必须在onCreate（）方法中  
+         * 写，比如：全屏、横竖屏必须在setContentView（）前面写，  
+         * 如果在onCreate（）方法中写太多东西的，一句话：太乱！！  
+         * */   
+           
+        init();   
+    }   
+   
+       
+    /**  
+     * 初始化实现  
+     */   
+    private void init(){   
+           
+        /**资源定位，添加监听*/   
+        startNext = (Button)findViewById(R.id.startNext);   
+        startNext.setOnClickListener(this);   
+           
+        firstPage = (ListView)findViewById(R.id.firstPage);   
+        secondPage = (ListView)findViewById(R.id.secondPage);   
+           
+        ArrayAdapter<String> firstAdapter = new ArrayAdapter<String>   
+            (this, android.R.layout.simple_list_item_1,firstItem);   
+        ArrayAdapter<String> secondAdapter = new ArrayAdapter<String>   
+            (this, android.R.layout.simple_list_item_1, secondItem);   
+           
+        firstPage.setAdapter(firstAdapter);   
+        secondPage.setAdapter(secondAdapter);   
+           
+    }   
+       
+    @Override   
+    public void onClick(View v) {   
+        changePage();   
+    }   
+   
+   
+    /*  
+     * 实现列表页面切换  
+     */   
+    private void changePage() {   
+           
+        final ListView visiable  ;   
+        final ListView invisiable ;   
+           
+        if(firstPage.getVisibility() == View.GONE){   
+            visiable = secondPage ;    
+            invisiable = firstPage ;    
+        }else{   
+            visiable = firstPage ;    
+            invisiable = secondPage ;    
+        }   
+           
+           
+        /*  
+         * 这个地方大家可能看到了ObjectAnimator这个类，一开始我也不知道是什么东西，很简单，查官方文档，  
+         * 官方文档中的解释一堆英文，我一直说的，我英文烂的要死，但不怕，只要你想，就肯定可以查出来的，大家  
+         * 只看一句：该类是 ValueAnimator的子类，可以根据给定的属性名称给目标对象设置动画参数  
+         */   
+           
+           
+        //效果一(此处效果顺序与效果图一一对应)   
+              /*final ObjectAnimator invisToVis = ObjectAnimator.ofFloat(invisiable, "rotationX",-90f, 0f);  
+              ObjectAnimator visToInvis = ObjectAnimator.ofFloat(visiable, "rotationX", 0f, 90f);*/   
+           
+        //效果二   
+              final ObjectAnimator invisToVis = ObjectAnimator.ofFloat(invisiable, "rotationY",-90f, 0f);   
+              ObjectAnimator visToInvis = ObjectAnimator.ofFloat(visiable, "rotationY", 0f, 90f);   
+           
+        //效果三(这个地方的alpha属性值大家只记一点：值越大越不透明就可以了！！！)   
+              /*final ObjectAnimator invisToVis = ObjectAnimator.ofFloat(invisiable, "alpha", 0.0f, 1.0f );  
+              ObjectAnimator visToInvis = ObjectAnimator.ofFloat(visiable, "alpha", 1.0f, 0.0f );*/   
+           
+                 
+        /*  
+         *效果四(此于是我犯的一个错误，很天真的以为应该也有rotationZ属性名称，其实是错的，  
+         *在ofFloat参数中并无此属性名称，但大家还是可以看到列表正常，其实显示 效果很不正常了  
+         *因为后台已经报错，但应用仍然不会停止 ，照常运行，但效果仅仅是两个ListView直接替换，  
+         *并无任何动画添加到其中，这个地方大家注意下)：   
+         *  ObjectAnimator.ofFloat(invisiable, "rotationZ",-90f, 0f);  
+         */   
+                 
+                 
+            visToInvis.setDuration(500);   
+            visToInvis.setInterpolator(accelerator);   
+            invisToVis.setDuration(500);   
+            invisToVis.setInterpolator(decelerator);   
+               
+            /*  
+             *这个地方记录下，下面这个监听器小马第一次见到，查阅官方文档解释如下：  
+             *此监听来监听动画的生命周期如：开始、结束、正在播放、循环播放等 ，  
+             *此处切记： Animation是不可以监听动画的，它只负责动画的  
+             */   
+            visToInvis.addListener(new AnimatorListenerAdapter() {   
+                @Override   
+                public void onAnimationEnd(Animator anim) {   
+                       
+                    /*  
+                     * 列举几个动画的监听：  
+                     * 一：anim.isRunning(){//TODO}  
+                     * 二：anim.isStarted(){//TODO}  
+                     * 三：anim.end(){//TODO}  
+                     */   
+                       
+                    visiable.setVisibility(View.GONE);   
+                    invisToVis.start();   
+                    invisiable.setVisibility(View.VISIBLE);   
+                }   
+            });   
+            visToInvis.start();   
+           
+    }   
+       
+}  

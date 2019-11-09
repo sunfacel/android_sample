@@ -1,0 +1,4 @@
+Android布局中 android:layout_weight 属性解释
+
+定义：所有View(视图)元素中都有一个XML属性android:layout_weight，其值为0，1，2，3...等整数值。
+            使用了之后，其对应界面中的元素比例就会发生变化，变大或者变小。layout_weight属性其实就是一个元素重要度的属性，用于在线性布局中为不同的view元素设置不同的重要度。

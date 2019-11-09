@@ -1,0 +1,135 @@
+   本文主要收集个人在Android应用开发过程中遇到一些问题，包括开发过程中遇到一些Bug应如何解决，或者如何通过代码调用某个方法实现一定的功能.....等等各种问题。俗话说：好记性不如烂笔头。
+【1】Android中如何通过单击Button按钮来实现 BACK(返回)功能：
+          网上有很多人都说通过调用：          
+[html] view plaincopy
+onKeyDown(KeyEvent.KEYCODE_BACK, null);  
+    onKeyDown(KeyEvent.KEYCODE_BACK, null);
+          来实现该功能。但会出现报错!!
+          其实可以通过调用如下系统的方法来实现该功能：
+[html] view plaincopy
+onBackPressed();  
+    onBackPressed();
+
+【2】Android中如何通过单击Button按钮(或者其它方式)实现 MENU(菜单) 功能：
+[html] view plaincopy
+openOptionsMenu();  
+
+【3】android.view.WindowManager$BadTokenException: Unable to add window -- token null is not for an application 异常解决方法：
+ 原由：定义了一个Context的变量，如 private Context mContext; 同时在 onCreate(Bundle savedInstanceState); 方法中采用 mContext = getApplicationContext(); 实例化。同时在该Activity中添加一个AlertDialog的提示对话框，采用如下方式实例化：
+[html] view plaincopy
+AlertDialog.Builder builder = new AlertDialog.Builder(mContext);  
+这样就会出现异常！致报这个错是在于new AlertDialog.Builder(mcontext)，虽然这里的参数是AlertDialog.Builder(Context context)但我们不能使用getApplicationContext()获得的Context,而必须使用Activity,因为只有一个Activity才能添加一个窗体。
+解决方法：将new AlertDialog.Builder(Context context)中的参数用Activity.this（Activity是你的Activity的名称）来填充就可以正确的创建一个Dialog了。
+
+【4】android中动态实现全屏和动态退出全屏方法：
+[html] view plaincopy
+/**  
+ * 动态设置全屏  
+ */  
+private void setFullScreen(){  
+    getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);  
+   }  
+  
+/**  
+ * 动态取消全屏  
+ */  
+private void quitFullScreen(){  
+    final WindowManager.LayoutParams attrs = getWindow().getAttributes();  
+    attrs.flags &= (~WindowManager.LayoutParams.FLAG_FULLSCREEN);  
+    getWindow().setAttributes(attrs);  
+    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);  
+}  
+
+【5】Android中如何获取SDCard的目录路径：
+[html] view plaincopy
+   /**  
+    * 获取SDCard的目录路径功能  
+    * @return  
+    */  
+private String getSDCardPath(){  
+    File sdcardDir = null;  
+    //判断SDCard是否存在  
+    boolean sdcardExist = Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED);  
+    if(sdcardExist){  
+        sdcardDir = Environment.getExternalStorageDirectory();  
+    }  
+    return sdcardDir.toString();  
+}  
+
+【6】getApplicationContext(); Activity.this; getBaseContext();的区别：
+getApplicationContext()返回应用的上下文，生命周期是整个应用，应用摧毁它才摧毁
+Activity.this的context 返回当前activity的上下文，属于activity ，activity 摧毁他就摧毁
+getBaseContext()  返回由构造函数指定或setBaseContext()设置的上下文
+
+【7】Android中如何动态获取组件布局的高度或宽度等属性信息
+很多时候，我们在Android的应用程序开发中，需要获取某组件的高度或者宽度等属性信息，如果我们在Activity中的 onCreate(Bundle parms); 直接获取组件的高度或宽度信息，得到的高度和宽度都为 0 。这时得到的结果并不是我们想要的结果，这是为什么呢？
+1. 在 Activity 中，当 onCreate 方法执行完后，Activity才能知道当前窗体的大小以及各组件的大小，所以我们可以在 onCreate 方法中添加  view.post(new Runnable(){...获取组件高度和宽度的代码体....}); 来获取组件的高度和宽度等信息。注：当onCreate方法执行完后，才去执行 post(new Runnable(){......}); 方法。
+2. 其实我们也可以在 onStart(); 方法中直接获取组件高度和宽度属性信息。
+
+【8】如何设置Eclipse工作空间的缺省字符编码?
+如果要使插件开发应用能有更好的国际化支持，能够最大程度的支持中文输出，则最好使 Java文件使用UTF-8编码。然而，Eclipse工作空间(workspace)的缺省字符编码是操作系统缺省的编码，简体中文操作系统 (Windows XP、Windows 2000简体中文)的缺省编码是GB18030，在此工作空间中建立的工程编码是GB18030，工程中建立的java文件也是GB18030。如果要使新建立工程、java文件直接使UTF-8则需要做以下工作：
+
+　　1、windows->Preferences...打开"首选项"对话框，左侧导航树，导航到general->Workspace，右侧Text file encoding，选择Other，改变为UTF-8，以后新建立工程其属性对话框中的Text file encoding即为UTF-8。
+
+　　2、windows->Preferences...打开"首选项"对话框，左侧导航树，导航到general->Content Types，右侧Context Types树，点开Text，选择Java Source File，在下面的Default encoding输入框中输入UTF-8，点Update，则设置Java文件编码为UTF-8。其他java应用开发相关的文件如：properties、XML等已经由Eclipse缺省指定，分别为ISO8859-1，UTF-8，如开发中确需改变编码格式则可以在此指定。
+
+【9】[注] Android应用程序中的 Activity 组件 和 Service 组件运行在同一线程中，但并不是运行于同一进程中。
+
+【10】Android开发中如何调试 Service。
+问题：
+以调试模式启动Android项目时，在service中设置断点，调试器不会停止下来
+解决方法：
+所有的这种情况下，都是在代码中声明。调用的方法是：
+[html] view plaincopy
+android.os.Debug.waitForDebugger();  
+
+
+【11】Android导入项目时出现：Android requires compiler compliance level 5.0 or 6.0. Found '1.4' instead. Please use Android Tools > Fix Project Properties. 的解决方法？
+           1. 按提示在工程文件上 右键 -> Android Tools -> Fix Project Properties ，该方法无效。
+           2. 手动打开Project Properties -> java Compiler -> 选上Enable project specific settings -> 再选择 Compiler Compliance Leave（选择任意一个非默认的值） -> OK 
+           3. 重复第2步，将Compiler Compliance Leave选为正确的值(该值一般是当前安装的JDK版本值，如 jdk 5 对应 1.5 ，jdk 6 对应 1.6)，OK。
+ 
+【12】 在ADT 16.0 中，定义一个ImageVIew的时候 总是提示这个[Accessibility] Missing contentDescription attribute on image警告，虽说可以不理 但总是感觉怪怪的。其实这是ADT 16.0的新特性，在一些没有文本显示的控件里，如imageView和imageButton等，ADT会提示你定义一个android:contentDescription属性，用来描述这个控件的作用。
+ 
+【13】如何检测Android真机摄像头硬件
+如果应用程序未利用manifest声明对摄像头需求进行特别指明，则应该在运行时检查一下摄像头是否可用。可用 PackageManager.hasSystemFeature() 方法来进行这种检查，代码示例如下：
+[html] view plaincopy
+<span style="FONT-SIZE: 16px">/** 检查设备是否提供摄像头 */   
+  
+private boolean checkCameraHardware(Context context) {   
+  
+    if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){   
+  
+        // 摄像头存在   
+        return true;   
+  
+    } else {   
+  
+        // 摄像头不存在   
+        return false;   
+  
+    }   
+  
+}</span>  
+Android设备可能拥有多个摄像头，比如向后的摄像头用于拍照、向前的摄像头用于摄像。Android 2.3 (API Level 9)以上版本允许利用 Camera.getNumberOfCameras() 方法来检查设备可用摄像头的数量。
+
+【14】Java中异常类体系
+         为了方便对于这些可传递对象的管理，Java API中专门设计了java.lang.Throwable类，只有该类子类的对象才可以在系统的异常传递体系中进行。该类的两个子类分别是：
+         1、Error类
+               该类代表错误，指程序无法恢复的异常情况。对于所有错误类型以及其子类，都不要求程序进行处理。常见的Error类例如内存溢出StackOverflowError等。
+         2、Exception类
+               该类代表异常，指程序有可能恢复的异常情况。该类就是整个Java语言异常类体系中的父类。使用该类，可以代表所有异常的情况。
+         在Java API中，声明了几百个Exception的子类分别来代表各种各样的常见异常情况，这些类根据需要代表的情况位于不同的包中，这些类的类名均以Exception作为类名的后缀。如果遇到的异常情况，Java API中没有对应的异常类进行代表，也可以声明新的异常类来代表特定的情况。
+         在这些异常类中，根据是否是程序自身导致的异常，将所有的异常类分为两种：
+         1、RuntimeException及其所有子类
+              该类异常属于程序运行时异常，也就是由于程序自身的问题导致产生的异常，例如数组下标越界异常ArrayIndexOutOfBoundsException等。
+              该类异常在语法上不强制程序员必须处理，即使不处理这样的异常也不会出现语法错误。
+         2、其它Exception子类
+              该类异常属于程序外部的问题引起的异常，也就是由于程序运行时某些外部问题导致产生的异常，例如文件不存在异常FileNotFoundException等。
+              该类异常在语法上强制程序员必须进行处理，如果不进行处理则会出现语法错误。
+【15】  Android中引入第三方jar包时,运行程序时提示java.lang.NoClassDefFoundError异常的解决方法。
+              这个问题个人觉得很怪异，引用的包中就有某个对象类，却报了这个错误，以下是个人的解决方法：
+              1、在工程下新建lib文件夹，将需要的第三方包拷贝进来。
+              2、将引用的第三方包，添加进工作的build path。
+              3、（关键的一步）将lib设为源文件夹。如果不设置，则程序编译可以通过，但运行的时候，会报：java.lang.NoClassDefFoundError
+【16】 未完待续...

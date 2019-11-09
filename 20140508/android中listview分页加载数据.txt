@@ -1,0 +1,225 @@
+   前段时间做的新浪微博项目一直想实现listview分页加载数据，今天终于实现了，哈哈！感觉挺好的，今天又写了个demo给大家分享下。
+
+              首先说下listview的优化方案，这也是面试中常考的题目。优化方案有三种：1,如果自定义适配器，那么在getView方法中判断contentView是否为空，如果为空创建contentView并返回，如果不为空直接返回contentView。这样能尽可能少创建view。2.给contentView设置tag，传入一个viewHoder对象，用于缓存要实现的数据。3，如果listview中显示的item太多，就要考虑分页加载了。
+
+               下面就注意介绍一下分页加载数据。首先在layout下创建listview.xml:
+
+           
+
+[html] view plaincopy
+<?xml version="1.0" encoding="utf-8"?>  
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"  
+    android:layout_width="match_parent"  
+    android:layout_height="match_parent"  
+    android:orientation="vertical" >  
+  
+    <ListView  
+        android:id="@+id/listView1"  
+        android:layout_width="match_parent"  
+        android:layout_height="wrap_content" >  
+    </ListView>  
+  
+</LinearLayout>  
+          然后创建listview_item.xml:
+          
+
+[html] view plaincopy
+<?xml version="1.0" encoding="utf-8"?>  
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"    
+    android:orientation="vertical"    
+    android:layout_width="fill_parent"    
+    android:layout_height="fill_parent">    
+    <TextView    
+        android:id="@+id/list_item_text"    
+        android:layout_width="fill_parent"    
+        android:layout_height="fill_parent"    
+        android:gravity="center"    
+        android:textSize="20sp"    
+        android:paddingTop="10dp"    
+        android:paddingBottom="10dp"/>    
+</LinearLayout>    
+
+           再为跟多按钮添加一个xml：
+
+      
+
+[html] view plaincopy
+<?xml version="1.0" encoding="utf-8"?>  
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"  
+    android:layout_width="fill_parent"  
+    android:layout_height="wrap_content"  
+    android:gravity="center"  
+    android:orientation="vertical" >  
+  
+    <Button  
+        android:id="@+id/loadMoreButton"  
+        android:layout_width="fill_parent"  
+        android:layout_height="wrap_content"  
+        android:onClick="loadMore"  
+        android:text="加载更多" />  
+  
+</LinearLayout>  
+      
+           代码部分：
+
+       
+
+[html] view plaincopy
+public class ListViewAdapter extends BaseAdapter {  
+  
+    private static Map<Integer,View> m=new HashMap<Integer,View>();  
+      
+    private List<String> items;  
+    private LayoutInflater inflater;  
+      
+    public ListViewAdapter(List<String> items, Context context) {  
+        super();  
+        this.items = items;  
+        this.inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);  
+    }  
+  
+    @Override  
+    public int getCount() {  
+        // TODO Auto-generated method stub  
+        return items.size();  
+    }  
+  
+    @Override  
+    public Object getItem(int position) {  
+        // TODO Auto-generated method stub  
+        return items.get(position);  
+    }  
+  
+    @Override  
+    public long getItemId(int position) {  
+        // TODO Auto-generated method stub  
+        return position;  
+    }  
+  
+    @Override  
+    public View getView(int position, View contentView, ViewGroup arg2) {  
+        // TODO Auto-generated method stub  
+        contentView=m.get(position);  
+        if(contentView==null){  
+            contentView=inflater.inflate(R.layout.listview_item, null);  
+            TextView text=(TextView) contentView.findViewById(R.id.list_item_text);  
+            text.setText(items.get(position));  
+        }  
+        m.put(position, contentView);  
+        return contentView;  
+    }  
+      
+    public void addItem(String item) {    
+        items.add(item);    
+    }    
+  
+}  
+
+         
+[html] view plaincopy
+public class ListViewActivity extends Activity implements OnScrollListener  {  
+      List<String> items = new ArrayList<String>();    
+     private ListView listView;    
+        private int visibleLastIndex = 0;   //最后的可视项索引    
+        private int visibleItemCount;       // 当前窗口可见项总数    
+        private ListViewAdapter adapter;    
+        private View loadMoreView;    
+        private Button loadMoreButton;    
+        private Handler handler = new Handler();    
+        
+        @Override    
+        public void onCreate(Bundle savedInstanceState) {    
+            super.onCreate(savedInstanceState);    
+            setContentView(R.layout.listview);    
+                
+            loadMoreView = getLayoutInflater().inflate(R.layout.load_more, null);    
+            loadMoreButton = (Button) loadMoreView.findViewById(R.id.loadMoreButton);    
+            loadMoreButton.setOnClickListener(new OnClickListener() {  
+                  
+                @Override  
+                public void onClick(View v) {  
+                    // TODO Auto-generated method stub  
+                    loadMoreButton.setText("正在加载...");   //设置按钮文字loading    
+                    handler.postDelayed(new Runnable() {    
+                        @Override    
+                        public void run() {    
+                                
+                            loadData();    
+                                
+                            adapter.notifyDataSetChanged(); //数据集变化后,通知adapter    
+                            listView.setSelection(visibleLastIndex - visibleItemCount + 1); //设置选中项    
+                                
+                            loadMoreButton.setText("加载更多");    //恢复按钮文字    
+                        }    
+                    }, 1000);    
+                }  
+            });  
+            listView = (ListView) this.findViewById(R.id.listView1);  
+                
+            listView.addFooterView(loadMoreView);   //设置列表底部视图    
+           // listView.addHeaderView(v)    //设置列表顶部视图  
+        
+            initAdapter();    
+                
+            listView.setAdapter(adapter);                //自动为id是list的ListView设置适配器    
+                
+            listView.setOnScrollListener(this);     //添加滑动监听    
+            listView.setOnItemClickListener(new OnItemClickListener() {  
+  
+                @Override  
+                public void onItemClick(AdapterView<?> arg0, View view,  
+                        int position, long arg3) {  
+                    // TODO Auto-generated method stub  
+                    Toast.makeText(getApplicationContext(), items.get(position),Toast.LENGTH_SHORT).show();  
+                }  
+            });  
+        }    
+            
+        /**   
+         * 初始化适配器   
+         */    
+        private void initAdapter() {    
+           
+            for (int i = 0; i < 20; i++) {    
+                items.add(String.valueOf(i + 1));    
+            }    
+            adapter = new ListViewAdapter(items,this);    
+        }    
+        
+        /**   
+         * 滑动时被调用   
+         */    
+        @Override    
+        public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {    
+            this.visibleItemCount = visibleItemCount;    
+            visibleLastIndex = firstVisibleItem + visibleItemCount - 1;    
+        }    
+        
+        /**   
+         * 滑动状态改变时被调用   
+         */    
+        @Override    
+        public void onScrollStateChanged(AbsListView view, int scrollState) {    
+            int itemsLastIndex = adapter.getCount() - 1;    //数据集最后一项的索引    
+            int lastIndex = itemsLastIndex + 1;             //加上底部的loadMoreView项    
+            if (scrollState == OnScrollListener.SCROLL_STATE_IDLE && visibleLastIndex == lastIndex) {    
+                //如果是自动加载,可以在这里放置异步加载数据的代码    
+                Log.i("LOADMORE", "loading...");    
+            }    
+        }    
+            
+  
+        /**   
+         * 模拟加载数据   
+         */    
+        private void loadData() {    
+            int count = adapter.getCount();    
+            for (int i = count; i < count + 20; i++) {    
+                adapter.addItem(String.valueOf(i + 1));    
+            }    
+        }  
+  
+          
+}  
+
+           最后看看效果：

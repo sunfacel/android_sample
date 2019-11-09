@@ -1,0 +1,39 @@
+
+F:\Android\adt-bundle-windows-x86-20131030\sdk\platform-tools
+
+1、android命令
+   显示SDK Manager.exe
+   
+2.android list avds:
+  列出所有创建的android模拟器.模拟器可以在eclipse中/windows/android virtual device manager中增删
+  
+3.android list targets:
+  命令是列出所有的SDK可用版本。
+  
+4.adb devices:
+  命令是列出所有装载的设置
+  显示结果如：emulator-5554
+  
+5.adb shell
+
+6.adb install XXX.apk.
+ 命令是安装apk文件，如果有多个设备(而你想把apk安装到emulator-5554这个模拟器上)
+    则要输入:adb install -s emulator-5554 D:/XXX.apk
+    
+7.emulator -avd avdname
+  命令将启动一个模拟器，初学者学会这条，就不用下次启动模拟器的时候还要打开Eclipse了
+  
+8.mksdcard 256M d:/sdcard.img
+  对于模拟器当然要创建sdcard了，这条命令是将在D盘下生成256M的sdcard.
+
+9.adb pull <remote> <local>/adb push <local> <remote>.
+ 创建完sdcard以后，要向里面放东西，或者把里面的东西弄出来，就用到以上命令了。
+ 以adb push(将sdcard外的东西存放进去.)为例，用法如下:adb push foo.txt /sdcard/foo.txt
+
+
+10.android create avd --name Android2.0 --target 5
+  创建avd 的命令。--name后面就是avd 的名称，target 是SDK的版本。这条语句是创建名称为Android2.0并且版本为5的avd.
+   创建完可以用android list avds。查看是否已经创建成功。
+
+11.ctrl + F11 键的使用
+    当我们启动模拟器的时候,通常是port模式，如果我们想在land下看效果,这个组合按钮就用到啦

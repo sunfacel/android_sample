@@ -1,0 +1,31 @@
+String str = "test中文汉字";
+
+String regEx = "[//u4e00-//u9fa5]";
+
+
+/**
+* 判断有没有中文
+*/
+
+if (str.getBytes().length == str.length()) {
+
+	System.out.println("无汉字");
+} 
+else {
+	System.out.println("有汉字");
+}
+
+
+/**
+* 如果有则打印出来
+*/
+
+Pattern p = Pattern.compile(regEx);
+
+Matcher m = p.matcher(str);
+
+while (m.find()) {
+	
+System.out.print(m.group(0) + "");
+
+}

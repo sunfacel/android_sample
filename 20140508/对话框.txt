@@ -1,0 +1,149 @@
+
+1.一个对话框，只有确定按钮
+new AlertDialog.Builder(self)  //Activity对象的引用，传入当前的上下文来引用。在onCreate方法中调用传入this即可。
+ .setTitle("标题") 
+ .setMessage("简单消息框")    //对话框内容
+ 	.setPositiveButton("确定", null)  //显示一个按钮：确定
+ 	.show();  //show方法显示出来
+
+
+
+2.下面是带确认和取消按钮的对话框:
+ 	new AlertDialog.Builder(self) 
+ 	.setTitle("确认")
+ 	.setMessage("确定吗？")
+ 	.setPositiveButton("是", null)
+ 	.setNegativeButton("否", null)    //按钮没有监听程序，第个参数则用null
+ 	.show();
+
+
+3.下面是一个可以输入文本的对话框:
+setView方法，为对话框传入了一个文本编辑框，也可以传入任何的视图对象，比如图片框，WebView等
+ 	new AlertDialog.Builder(self)
+ 	.setTitle("请输入")
+ 	.setIcon(android.R.drawable.ic_dialog_info)
+ 	.setView(new EditText(self))         //输入框
+ 	.setPositiveButton("确定", null)
+ 	.setNegativeButton("取消", null)
+ 	.show();
+
+4.下面是单选框与多选框，也是非常有用的两种对话框:
+
+      单选
+ 	new AlertDialog.Builder(self)
+ 	.setTitle("请选择")
+ 	.setIcon(android.R.drawable.ic_dialog_info)                
+ 	.setSingleChoiceItems(new String[] {"选项1","选项2","选项3","选项4"}, 0, 
+ 	  new DialogInterface.OnClickListener() {
+ 	     public void onClick(DialogInterface dialog, int which) {
+ 	        dialog.dismiss();
+ 	     }
+ 	  }
+ 	)
+ 	.setNegativeButton("取消", null)
+ 	.show();
+
+
+     多选
+	new AlertDialog.Builder(self)
+	.setTitle("多选框")
+	.setMultiChoiceItems(new String[] {"选项1","选项2","选项3","选项4"}, null, null)
+	.setPositiveButton("确定", null)                
+	.setNegativeButton("取消", null)
+	.show();
+
+
+5.列表对话框:
+	new AlertDialog.Builder(self)
+	.setTitle("列表框")
+	.setItems(new String[] {"列表项1","列表项2","列表项3"}, null)
+	.setNegativeButton("确定", null)
+	.show();
+
+6.对话框中显示图片:
+
+    ImageView img = new ImageView(self);
+    img.setImageResource(R.drawable.icon);
+	  
+    new AlertDialog.Builder(self)
+	.setTitle("图片框")
+	.setView(img)
+	.setPositiveButton("确定", null)
+	.show();
+
+
+
+7.使用AlertDialog:
+AlertDialog类是Dialog类的子类。它默认提供了3个按钮和一个文本消息。这些按钮可以按需要来使他们显示或隐藏。下列代码将创建一个AlertDialog对话框，对话框上将向用户展示一个问题以及备选的yes/no答案：
+AlertDialog dialog = new AlertDialog.Builder(context).create();
+dialog.setMessage(”Do you play cricket?”);
+dialog.setButton(”Yes”, myOnClickListener);
+dialog.setButton2(”No”, myOnClickListener);
+dialog.show();
+myOnClickListener这个事件监听器的代码可以类似如下：
+public void onClick(DialogInterface dialog, int i) {
+    switch (i) {
+        case AlertDialog.BUTTON1:
+           
+           break;
+        case AlertDialog.BUTTON2:
+           
+            break;
+    }
+}
+
+8.Activity托管对话框:
+Android也提供了创建对话框的快捷方式，在Activity中可以通过如showDialog()， onCreateDialog()， onPrepareDialog()，dismissDialog()， removeDialog()等方法来创建和管理对话框。
+Activity的onCreateDialog方法用于在创建并显示对话框的时候调用，比如：
+@Override
+protected Dialog onCreateDialog(int id) {
+    return new AlertDialog.Builder(this).setMessage(”How are you?”).setPositiveButton(
+          ”Fine”,
+          new DialogInterface.OnClickListener() {
+              public void onClick(DialogInterface dialog, int which) {
+                 
+             }
+          }).setNegativeButton(”Not so good”, new DialogInterface.OnClickListener() {
+              public void onClick(DialogInterface dialog, int which) {
+                
+              }
+          }
+    ).create();
+}
+你可以同时创建多个对话框，通过为他们设置id参数来区分它们，然后可以通过 showDialog(id)方法来显示。 onCreateDialog方法只会在第一次调用showDialog方法时才会被调用，在之后的showDialog()的调用中，对话框不是被新建出来的，而是直接显示之前创建过的那些对话框。
+
+如果你想要更新对话框的内容，你只要在 onPrepareDialog()中作相应的工作就可以了，该方法会在对话框显示之前进行调用。
+dismissDialog()方法是用来关闭对话框的；removeDialog()方法用来将对话框从Activity的托管中移除（如果对已经移除的对话框重新进行调用showDialog ，则该对话框将进行重新创建）。
+
+
+
+9.改变了对话框的图表，添加了三个按钮
+Dialog dialog = new AlertDialog.Builder(this).setIcon(
+     android.R.drawable.btn_star).setTitle("喜好调查").setMessage(
+     "你喜欢李连杰的电影吗？").setPositiveButton("很喜欢",
+     new OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+       // TODO Auto-generated method stub
+       Toast.makeText(Main.this, "我很喜欢他的电影。",
+         Toast.LENGTH_LONG).show();
+      }
+     }).setNegativeButton("不喜欢", new OnClickListener() {
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+     // TODO Auto-generated method stub
+     Toast.makeText(Main.this, "我不喜欢他的电影。", Toast.LENGTH_LONG)
+       .show();
+    }
+   }).setNeutralButton("一般", new OnClickListener() {
+    @Override
+    public void onClick(DialogInterface dialog, int which) {
+     // TODO Auto-generated method stub
+     Toast.makeText(Main.this, "谈不上喜欢不喜欢。", Toast.LENGTH_LONG)
+       .show();
+    }
+   }).create();
+   dialog.show();
+
+
+

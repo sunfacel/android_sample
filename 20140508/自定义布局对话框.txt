@@ -1,0 +1,22 @@
+信息内容是一个自定义的布局
+1.布局文件
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+ android:layout_height="wrap_content" android:layout_width="wrap_content"
+ android:background="#ffffffff" android:orientation="horizontal"
+ android:id="@+id/dialog">
+ <TextView android:layout_height="wrap_content"
+   android:layout_width="wrap_content"
+  android:id="@+id/tvname" android:text="姓名：" />
+ <EditText android:layout_height="wrap_content"
+  android:layout_width="wrap_content" android:id="@+id/etname" android:minWidth="100dip"/>
+</LinearLayout>
+
+2.调用代码
+   LayoutInflater inflater = getLayoutInflater();
+   View layout = inflater.inflate(R.layout.dialog,(ViewGroup) findViewById(R.id.dialog));
+   new AlertDialog.Builder(this)
+     .setTitle("自定义布局").setView(layout)
+     .setPositiveButton("确定", null)
+     .setNegativeButton("取消", null)
+     .show();

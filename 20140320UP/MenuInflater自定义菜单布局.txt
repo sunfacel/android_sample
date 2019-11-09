@@ -1,0 +1,76 @@
+
+
+MenuInflater  是用来解析定义在menu 目录下的菜单布局文件
+
+1.在res 目录下创建menu 目录，并且创建options_menu.xml (我们定义的菜单)文件
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/menu_add"
+          android:title="Add"
+          android:icon="@android:drawable/ic_menu_add"
+           />
+    <item android:id="@+id/menu_wallaper"
+          android:title="Wallpaper"
+          android:icon="@android:drawable/ic_menu_gallery"
+           />
+   <item android:id="@+id/menu_search"
+          android:title="Search"
+          android:icon="@android:drawable/ic_search_category_default"
+           />
+   <item android:id="@+id/menu_setting"
+          android:title="Settings"
+          android:icon="@android:drawable/ic_menu_preferences"
+           />
+</menu>
+
+2.指定上面的布局文件，并使用，以下为java文件内容：
+
+package com.android.tutor;
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+public class MenuInflaterDemo extends Activity {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+    }
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+    	MenuInflater inflater = getMenuInflater();
+    	inflater.inflate(R.menu.options_menu, menu);	
+    	return true;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+    	switch (item.getItemId()) {
+		case R.id.menu_add:
+			
+			break;
+		case R.id.menu_wallaper:
+			break;
+		case R.id.menu_search:
+			break;
+		case R.id.menu_setting:
+			showSettings();
+			break;
+		}
+    	return super.onOptionsItemSelected(item);
+    }
+    
+    
+    private void showSettings(){
+    	
+   	 final Intent settings = new Intent(android.provider.Settings.ACTION_SETTINGS);
+	        settings.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+	                Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+	        
+	    startActivity(settings);
+   }
+}

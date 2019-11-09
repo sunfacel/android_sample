@@ -1,0 +1,40 @@
+ 自定义Activity漂亮跳转效果
+
+两个Activity跳转的时候，自定义翻页效果：
+[java] view plaincopyprint?
+Intent intent = new Intent(FirstActivity.this, SecondActivity.class);  
+startActivityForResult(intent, 11);  
+              
+//添加界面切换效果，注意只有Android的2.0(SdkVersion版本号为5)以后的版本才支持  
+int version = Integer.valueOf(android.os.Build.VERSION.SDK);     
+if(version  >= 5) {     
+     overridePendingTransition(R.anim.zoomin, R.anim.zoomout);  //此为自定义的动画效果，下面两个为系统的动画效果  
+   //overridePendingTransition(android.R.anim.fade_in,android.R.anim.fade_out);    
+     //overridePendingTransition(android.R.anim.slide_in_left,android.R.anim.slide_out_right);  
+}    
+
+下面为两个自定义的动画效果XML文件，存放位置为：res/anim/
+1，动画进入效果：zoomin.xml
+[html] view plaincopyprint?
+<?xml version="1.0" encoding="utf-8"?>  
+<set xmlns:android="http://schemas.android.com/apk/res/android"  
+        android:interpolator="@android:anim/decelerate_interpolator">  
+    <scale android:fromXScale="2.0" android:toXScale="1.0"  
+           android:fromYScale="2.0" android:toYScale="1.0"  
+           android:pivotX="50%p" android:pivotY="50%p"  
+           android:duration="@android:integer/config_mediumAnimTime" />  
+</set>  
+
+2，动画退出效果：zoomout.xml
+[html] view plaincopyprint?
+<?xml version="1.0" encoding="utf-8"?>  
+<set xmlns:android="http://schemas.android.com/apk/res/android"  
+        android:interpolator="@android:anim/decelerate_interpolator"  
+        android:zAdjustment="top">  
+    <scale android:fromXScale="1.0" android:toXScale=".5"  
+           android:fromYScale="1.0" android:toYScale=".5"  
+           android:pivotX="50%p" android:pivotY="50%p"  
+           android:duration="@android:integer/config_mediumAnimTime" />  
+    <alpha android:fromAlpha="1.0" android:toAlpha="0"  
+           android:duration="@android:integer/config_mediumAnimTime"/>  
+</set>   

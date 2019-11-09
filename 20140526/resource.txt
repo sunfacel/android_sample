@@ -1,0 +1,135 @@
+
+正误的资源使用方法：
+// Load a background for the current screen from a drawable resource. 
+this.getWindow().setBackgroundDrawableResource(R.drawable.my_background_image); 
+ 
+// WRONG Sending a string resource reference into a  
+// method that expects a string. 
+this.getWindow().setTitle(R.string.main_title); 
+ 
+// RIGHT Need to get the title from the Resources wrapper. 
+this.getWindow().setTitle(Resources.getText(R.string.main_title)); 
+ 
+// Load a custom layout for the current screen. 
+setContentView(R.layout.main_screen); 
+ 
+// Set a slide in animation for a ViewFlipper object. 
+mFlipper.setInAnimation(AnimationUtils.loadAnimation(this,  
+        R.anim.hyperspace_in)); 
+ 
+// Set the text on a TextView object. 
+TextView msgTextView = (TextView)findViewByID(R.id.msg); 
+msgTextView.setText(R.string.hello_message);  
+
+为什么window.setTitle要先Resources.getText，原来setTitle的参数是CharSequence，Resources.getText(int)返回的是CharSequence；而其他setText的参数有的是CharSequence，有的是int（这就是Resources变量值）
+
+
+-------------------------
+官方给两个使用系统资源的例子：
+//在屏幕上显示标准应用程序的图标
+public class MyActivity extends Activity { 
+    public void onStart() { 
+        requestScreenFeatures(FEATURE_BADGE_IMAGE); 
+        super.onStart(); 
+        setBadgeResource(android.R.drawable.sym_def_app_icon); 
+    } 
+} 
+ 
+//应用系统定义的标准"绿色背景"视觉处理 
+public class MyActivity extends Activity 
+    public void onStart() { 
+        super.onStart(); 
+        setTheme(android.R.style.Theme_Black); 
+    } 
+} 
+
+
+--------------------------
+引用系统资源
+       android:textColor="@android:color/opaque_red"   指定package: android
+
+-------------------------------
+
+引用主题属性
+        另外一种资源值允许你引用当前主题中的属性的值。这个属性值只能在样式资源和XML属性中使用；它允许你通过将它们改变为当前主题提供的标准变化来改变UI元素的外观，而不是提供具体的值。
+        android:textColor="?android:textDisabledColor"
+    
+        注意，这和资源引用非常类似，除了我们使用一个"?"前缀代替了"@"。当你使用这个标记时，你就提供了属性资源的名称，它将会在主题中被查找--因为资源工具知道需要的属性资源，所以你不需要显示声明这个类型(如果声明，其形式就是?android:attr/android:textDisabledColor)。除了使用这个资源的标识符来查询主题中的值代替原始的资源，其命名语法和"@"形式一致：?[namespace:]type/name，这里类型可选。
+
+-------------------------------
+
+Color Value
+语法：
+<color name="color_name">#color_value</color> 
+可以保存在res/values/colors.xml (文件名可以任意)。
+xml引用：android:textColor="@color/color_name"
+Java引用： int color = Resources.getColor(R.color.color_name)
+ 
+其中#color_value有以下格式（A代表Alpha通道）：
+#RGB
+#ARGB
+#RRGGBB
+#AARRGGBB
+ 
+xml示例(声明两个颜色，第一个不透明，第二个透明色)：
+<?xml version="1.0" encoding="utf-8"?> 
+<resources> 
+    <color name="opaque_red">#f00</color> 
+    <color name="translucent_red">#80ff0000</color> 
+</resources> 
+
+------------------------------------
+
+Color Drawables
+语法：
+<drawable name="color_name">color_value</drawable> 
+可以保存在res/values/colors.xml。
+xml引用：android:background="@drawable/color_name"
+java引用：Drawable redDrawable = Resources.getDrawable(R.drawable.color_name)
+ 
+color_name和上面的一样。个人认为，一般情况下使用color属性，当需要用到paintDrawable时才使用drawable属性。
+ 
+xml示例：
+<?xml version="1.0" encoding="utf-8"?> 
+<resources> 
+    <drawable name="opaque_red">#f00</drawable> 
+    <drawable name="translucent_red">#80ff0000</drawable> 
+</resources> 
+
+-----------------------------------------
+dimension
+语法：
+<dimen name="dimen_name">dimen_value单位</dimen> 
+一般保存为res/values/dimen.xml。
+度量单位：
+px(象素): 屏幕实际的象素，常说的分辨率1024*768pixels，就是横向1024px, 纵向768px，不同设备显示效果相同。
+ 
+in(英寸): 屏幕的物理尺寸, 每英寸等于2.54厘米。
+ 
+mm(毫米): 屏幕的物理尺寸。
+ 
+pt(点)  : 屏幕的物理尺寸。1/72英寸。
+ 
+dp/dip  : 与密度无关的象素，一种基于屏幕密度的抽象单位。在每英寸160点的显示器上，1dp = 1px。但dp和px的比例会随着屏幕密度的变化而改变，不同设备有不同的显示效果。设置宽度或者高度等属性时，推荐使用dp(dip)作为单位
+ 
+sp      : 与刻度无关的象素，主要用于字体显示best for textsize，作为和文字相关大小单位。
+ 
+XML: android:textSize="@dimen/some_name"
+Java: float dimen = Resources.getDimen(R.dimen.some_name)
+ 
+xml示例：
+<?xml version="1.0" encoding="utf-8"?> 
+<resources> 
+    <dimen name="one_pixel">1px</dimen> 
+    <dimen name="double_density">2dp</dimen> 
+    <dimen name="sixteen_sp">16sp</dimen> 
+</resources> 
+
+-----------------------------
+
+assets文件夹资源的访问
+       assets文件夹里面的文件都是保持原始的文件格式，需要用AssetManager以字节流的形式读取文件。
+      1. 先在Activity里面调用getAssets()来获取AssetManager引用。
+      2. 再用AssetManager的open(String fileName, int accessMode)方法则指定读取的文件以及访问模式就能得到输入流InputStream。 
+      3. 然后就是用已经open file 的inputStream读取文件，读取完成后记得inputStream.close()。
+      4.调用AssetManager.close()关闭AssetManager。

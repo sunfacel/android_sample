@@ -1,0 +1,66 @@
+该篇文章是说明在Android手机或平板电脑中如何实现截取当前屏幕的功能，并把截取的屏幕保存到SDCard中的某个目录文件夹下面。实现的代码如下：
+[html] view plaincopy
+/**  
+ * 获取和保存当前屏幕的截图  
+ */  
+private void GetandSaveCurrentImage()    
+{    
+    //1.构建Bitmap    
+    WindowManager windowManager = getWindowManager();    
+    Display display = windowManager.getDefaultDisplay();    
+    int w = display.getWidth();    
+    int h = display.getHeight();    
+        
+    Bitmap Bmp = Bitmap.createBitmap( w, h, Config.ARGB_8888 );        
+        
+    //2.获取屏幕    
+    View decorview = this.getWindow().getDecorView();     
+    decorview.setDrawingCacheEnabled(true);     
+    Bmp = decorview.getDrawingCache();     
+      
+    String SavePath = getSDCardPath()+"/AndyDemo/ScreenImage";  
+    
+    //3.保存Bitmap     
+    try {    
+        File path = new File(SavePath);    
+        //文件    
+        String filepath = SavePath + "/Screen_1.png";    
+        File file = new File(filepath);    
+        if(!path.exists()){    
+            path.mkdirs();    
+        }    
+        if (!file.exists()) {    
+            file.createNewFile();    
+        }    
+            
+        FileOutputStream fos = null;    
+        fos = new FileOutputStream(file);    
+        if (null != fos) {    
+            Bmp.compress(Bitmap.CompressFormat.PNG, 90, fos);    
+            fos.flush();    
+            fos.close();      
+                
+            Toast.makeText(mContext, "截屏文件已保存至SDCard/AndyDemo/ScreenImage/下", Toast.LENGTH_LONG).show();    
+        }    
+    
+    } catch (Exception e) {    
+        e.printStackTrace();    
+    }    
+}    
+  
+   /**  
+    * 获取SDCard的目录路径功能  
+    * @return  
+    */  
+private String getSDCardPath(){  
+    File sdcardDir = null;  
+    //判断SDCard是否存在  
+    boolean sdcardExist = Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED);  
+    if(sdcardExist){  
+        sdcardDir = Environment.getExternalStorageDirectory();  
+    }  
+    return sdcardDir.toString();  
+}  
+由于要对SDCard进行操作，所以别忘记了在manifest.xml文件中赋以对SDCard的读写权限：
+[html] view plaincopy
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>  

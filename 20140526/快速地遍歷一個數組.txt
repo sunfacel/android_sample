@@ -1,0 +1,9 @@
+如何快速地遍歷一個數組呢？
+使用數組的一個工具類：Arrays
+[java] view plaincopy在CODE上查看代码片派生到我的代码片
+String [] a4 = new String[]{"a","b","c"};  
+  
+System.out.println(Arrays.asList(a4));  
+
+輸出：
+[a, b, c]

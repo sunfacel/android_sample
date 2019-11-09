@@ -1,0 +1,260 @@
+现在很多android的应用都采用底部导航栏的功能，这样可以使得用户在使用过程中随意切换不同的页面，现在我采用TabHost组件来自定义一个底部的导航栏的功能。
+我们先看下该demo实例的框架图：
+
+其中各个类的作用以及资源文件就不详细解释了，还有资源图片(在该Demo中借用了其它应用程序的资源图片)也不提供了，大家可以自行更换自己需要的资源图片。直接上各个布局文件或各个类的代码：
+[1]  res/layout目录下的 maintabs.xml 源码：
+[html] view plaincopy
+<?xml version="1.0" encoding="UTF-8"?>  
+<TabHost android:id="@android:id/tabhost" android:layout_width="fill_parent" android:layout_height="fill_parent"  
+  xmlns:android="http://schemas.android.com/apk/res/android">  
+    <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent">  
+        <FrameLayout android:id="@android:id/tabcontent" android:layout_width="fill_parent" android:layout_height="0.0dip" android:layout_weight="1.0" />  
+        <TabWidget android:id="@android:id/tabs" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="wrap_content" android:layout_weight="0.0" />  
+            <RadioGroup   
+                android:gravity="center_vertical" android:layout_gravity="bottom" android:orientation="horizontal" android:id="@id/main_radio" android:background="@drawable/maintab_toolbar_bg"   
+                android:layout_width="fill_parent" android:layout_height="wrap_content">  
+                <RadioButton  android:id="@id/radio_button0" android:layout_marginTop="2.0dip" android:text="@string/main_home" android:drawableTop="@drawable/icon_1_n" style="@style/main_tab_bottom" />  
+                <RadioButton  android:id="@id/radio_button1" android:layout_marginTop="2.0dip" android:text="@string/main_news" android:drawableTop="@drawable/icon_2_n" style="@style/main_tab_bottom" />  
+                <RadioButton  android:id="@id/radio_button2" android:layout_marginTop="2.0dip" android:text="@string/main_manage_date" android:drawableTop="@drawable/icon_3_n" style="@style/main_tab_bottom" />  
+                <RadioButton  android:id="@id/radio_button3" android:layout_marginTop="2.0dip" android:text="@string/main_friends" android:drawableTop="@drawable/icon_4_n" style="@style/main_tab_bottom" />  
+                <RadioButton  android:id="@id/radio_button4" android:layout_marginTop="2.0dip" android:text="@string/more" android:drawableTop="@drawable/icon_5_n" style="@style/main_tab_bottom" />  
+            </RadioGroup>  
+    </LinearLayout>  
+</TabHost>  
+[2] res/drawable 下的 home_btn_bg.xml 源码：
+[html] view plaincopy
+<?xml version="1.0" encoding="UTF-8"?>  
+<selector  
+  xmlns:android="http://schemas.android.com/apk/res/android">  
+    <item android:state_focused="true" android:state_enabled="true" android:state_pressed="false" android:drawable="@drawable/home_btn_bg_s" />  
+    <item android:state_enabled="true" android:state_pressed="true" android:drawable="@drawable/home_btn_bg_s" />  
+    <item android:state_enabled="true" android:state_checked="true" android:drawable="@drawable/home_btn_bg_d" />  
+    <item android:drawable="@drawable/transparent" />  
+</selector>  
+[3] res/values 下的源码：
+dimens.xml源码
+[html] view plaincopy
+<?xml version="1.0" encoding="utf-8"?>  
+<resources>  
+  
+    <dimen name="bottom_tab_font_size">10.0sp</dimen>  
+    <dimen name="bottom_tab_padding_up">5.0dip</dimen>  
+    <dimen name="bottom_tab_padding_drawable">2.0dip</dimen>  
+    <dimen name="switch_logo_bottom_padding">30.0sp</dimen>  
+    <dimen name="widget_height">100.0dip</dimen>  
+    <dimen name="sta_height">48.0dip</dimen>  
+    <dimen name="large_padding_length">20.0dip</dimen>  
+    <dimen name="widget_write_margin_top">19.0dip</dimen>  
+    <dimen name="widget_write_margin_left">10.0dip</dimen>  
+    <dimen name="widget_content_margin_top">20.0dip</dimen>  
+    <dimen name="widget_content_margin_left">10.0dip</dimen>  
+    <dimen name="widget_logo_size">35.0dip</dimen>  
+    <dimen name="title_height">74.0dip</dimen>  
+    <dimen name="new_blog_size">70.0dip</dimen>  
+    <dimen name="emotion_item_view_height">13.299988dip</dimen>  
+    <dimen name="splash_test_top_margin_top">20.0dip</dimen>  
+    <dimen name="splash_test_center_margin_right">0.0dip</dimen>  
+    <dimen name="title_text_size">20.0sp</dimen>  
+    <dimen name="normal_padding_length">10.0dip</dimen>  
+    <dimen name="no_result_padding_length">50.0dip</dimen>  
+  
+</resources>  
+
+drawables.xml源码：
+[html] view plaincopy
+<?xml version="1.0" encoding="utf-8"?>  
+<resources>  
+  
+    <item type="drawable" name="ltgray">#fff4f4f4</item>  
+    <item type="drawable" name="ltyellow">#fffff4db</item>  
+    <item type="drawable" name="black">#ff000000</item>  
+    <item type="drawable" name="transparent">#00000000</item>  
+    <item type="drawable" name="widget_edit_block_bg_normal">@android:color/transparent</item>  
+    <item type="drawable" name="transparent_background">#99000000</item>  
+    <item type="drawable" name="list_background">#fff4f4f4</item>  
+    <item type="drawable" name="namcard_picker_bkg_normal">#ff272727</item>  
+    <item type="drawable" name="namcard_picker_bkg_hover">#ff333333</item>  
+  
+</resources>  
+
+ids.xml源码：
+[html] view plaincopy
+<?xml version="1.0" encoding="utf-8"?>  
+<resources>  
+  
+    <item type="id" name="main_radio">false</item>  
+    <item type="id" name="radio_button0">false</item>  
+    <item type="id" name="radio_button1">false</item>  
+    <item type="id" name="radio_button2">false</item>  
+    <item type="id" name="radio_button3">false</item>  
+    <item type="id" name="radio_button4">false</item>  
+  
+</resources>  
+
+strings.xml源码：
+[html] view plaincopy
+<?xml version="1.0" encoding="utf-8"?>  
+<resources>  
+    <string name="hello">Hello World, MainTabActivity!</string>  
+    <string name="app_name">TabDemo</string>  
+    <string name="main_news">消息</string>  
+    <string name="main_home">首页</string>  
+    <string name="more">更多</string>  
+    <string name="main_manage_date">时间</string>  
+    <string name="main_friends">好友</string>  
+</resources>  
+
+styles.xml源码：
+[html] view plaincopy
+<?xml version="1.0" encoding="utf-8"?>  
+<resources>  
+  
+     <style name="main_tab_bottom">  
+        <item name="android:textSize">@dimen/bottom_tab_font_size</item>  
+        <item name="android:textColor">#ffffffff</item>  
+        <item name="android:ellipsize">marquee</item>  
+        <item name="android:gravity">center_horizontal</item>  
+        <item name="android:background">@drawable/home_btn_bg</item>  
+        <item name="android:paddingTop">@dimen/bottom_tab_padding_up</item>  
+        <item name="android:paddingBottom">2.0dip</item>  
+        <item name="android:layout_width">fill_parent</item>  
+        <item name="android:layout_height">wrap_content</item>  
+        <item name="android:layout_marginBottom">2.0dip</item>  
+        <item name="android:button">@null</item>  
+        <item name="android:singleLine">true</item>  
+        <item name="android:drawablePadding">@dimen/bottom_tab_padding_drawable</item>  
+        <item name="android:layout_weight">1.0</item>  
+    </style>  
+  
+</resources>  
+
+[4] src/com.andyidea.tabdemo包下面各个UI界面类源码：
+MainTabActivity.java源码：
+[html] view plaincopy
+package com.andyidea.tabdemo;  
+  
+import android.app.TabActivity;  
+import android.content.Intent;  
+import android.os.Bundle;  
+import android.view.Window;  
+import android.widget.CompoundButton;  
+import android.widget.RadioButton;  
+import android.widget.CompoundButton.OnCheckedChangeListener;  
+import android.widget.TabHost;  
+  
+public class MainTabActivity extends TabActivity implements OnCheckedChangeListener{  
+      
+    private TabHost mTabHost;  
+    private Intent mAIntent;  
+    private Intent mBIntent;  
+    private Intent mCIntent;  
+    private Intent mDIntent;  
+    private Intent mEIntent;  
+      
+    /** Called when the activity is first created. */  
+    @Override  
+    public void onCreate(Bundle savedInstanceState) {  
+        super.onCreate(savedInstanceState);  
+        requestWindowFeature(Window.FEATURE_NO_TITLE);  
+        setContentView(R.layout.maintabs);  
+          
+        this.mAIntent = new Intent(this,AActivity.class);  
+        this.mBIntent = new Intent(this,BActivity.class);  
+        this.mCIntent = new Intent(this,CActivity.class);  
+        this.mDIntent = new Intent(this,DActivity.class);  
+        this.mEIntent = new Intent(this,EActivity.class);  
+          
+        ((RadioButton) findViewById(R.id.radio_button0))  
+        .setOnCheckedChangeListener(this);  
+        ((RadioButton) findViewById(R.id.radio_button1))  
+        .setOnCheckedChangeListener(this);  
+        ((RadioButton) findViewById(R.id.radio_button2))  
+        .setOnCheckedChangeListener(this);  
+        ((RadioButton) findViewById(R.id.radio_button3))  
+        .setOnCheckedChangeListener(this);  
+        ((RadioButton) findViewById(R.id.radio_button4))  
+        .setOnCheckedChangeListener(this);  
+          
+        setupIntent();  
+    }  
+  
+    @Override  
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {  
+        if(isChecked){  
+            switch (buttonView.getId()) {  
+            case R.id.radio_button0:  
+                this.mTabHost.setCurrentTabByTag("A_TAB");  
+                break;  
+            case R.id.radio_button1:  
+                this.mTabHost.setCurrentTabByTag("B_TAB");  
+                break;  
+            case R.id.radio_button2:  
+                this.mTabHost.setCurrentTabByTag("C_TAB");  
+                break;  
+            case R.id.radio_button3:  
+                this.mTabHost.setCurrentTabByTag("D_TAB");  
+                break;  
+            case R.id.radio_button4:  
+                this.mTabHost.setCurrentTabByTag("MORE_TAB");  
+                break;  
+            }  
+        }  
+          
+    }  
+      
+    private void setupIntent() {  
+        this.mTabHost = getTabHost();  
+        TabHost localTabHost = this.mTabHost;  
+  
+        localTabHost.addTab(buildTabSpec("A_TAB", R.string.main_home,  
+                R.drawable.icon_1_n, this.mAIntent));  
+  
+        localTabHost.addTab(buildTabSpec("B_TAB", R.string.main_news,  
+                R.drawable.icon_2_n, this.mBIntent));  
+  
+        localTabHost.addTab(buildTabSpec("C_TAB",  
+                R.string.main_manage_date, R.drawable.icon_3_n,  
+                this.mCIntent));  
+  
+        localTabHost.addTab(buildTabSpec("D_TAB", R.string.main_friends,  
+                R.drawable.icon_4_n, this.mDIntent));  
+  
+        localTabHost.addTab(buildTabSpec("MORE_TAB", R.string.more,  
+                R.drawable.icon_5_n, this.mEIntent));  
+  
+    }  
+      
+    private TabHost.TabSpec buildTabSpec(String tag, int resLabel, int resIcon,  
+            final Intent content) {  
+        return this.mTabHost.newTabSpec(tag).setIndicator(getString(resLabel),  
+                getResources().getDrawable(resIcon)).setContent(content);  
+    }  
+}  
+其中 AActivity.java 与 BActivity.java ，CActivity.java ，DActivity.java ，EActivity.java 中的源码都一样，只是用来表示不同的界面展示，故这里只列出 AActivity.java的源码：
+[html] view plaincopy
+package com.andyidea.tabdemo;  
+  
+import android.app.Activity;  
+import android.os.Bundle;  
+import android.view.Gravity;  
+import android.widget.TextView;  
+  
+public class AActivity extends Activity{  
+      
+    @Override  
+    public void onCreate(Bundle savedInstanceState) {  
+        super.onCreate(savedInstanceState);  
+          
+        TextView tv = new TextView(this);  
+        tv.setText("This is A Activity!");  
+        tv.setGravity(Gravity.CENTER);  
+        setContentView(tv);  
+    }  
+  
+}  
+最后，大家别忘了在 AndroidManifest.xml 文件中注册各个 Activity 组件哦。好了，现在我们看下我们程序运行的效果图：
+
+
+
+到此就实现了一个比较流行的底部导航栏的功能了，转载请注明出处，谢谢大家！
+由于需要该实例源码的童鞋比较多，我还是把源码放到资源中供大家下载：http://download.csdn.net/detail/cjjky/4236055

@@ -1,0 +1,87 @@
+大家好，今天说说Location , Location 在Android 开发中还是经常用到的，比如 通过经纬度获取天气，
+根据Location 获取所在地区详细Address （比如Google Map 开发).等。而在Android 中通过LocationManager 
+来获取Location .通常获取Location 有GPS 获取，WIFI 获取
+
+如何获取Location ,从而获取经纬度
+
+1.修改main.xml 代码如下:
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+<TextView 
+	android:id="@+id/longitude" 
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:text="longitude:"
+    />
+<TextView
+	android:id="@+id/latitude"  
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:text="latitude:"
+    />
+</LinearLayout>
+
+2.修改LocationDemo.java ，代码如下:
+
+package com.android.tutor;
+import android.app.Activity;
+import android.content.Context;
+import android.location.Location;
+import android.location.LocationManager;
+import android.os.Bundle;
+import android.widget.TextView;
+public class LocationDemo extends Activity {
+   
+	private TextView longitude;
+	private TextView latitude;
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+        
+        longitude = (TextView)findViewById(R.id.longitude);
+        latitude = (TextView)findViewById(R.id.latitude);
+        
+        Location mLocation = getLocation(this);
+        
+        longitude.setText("Longitude: " + mLocation.getLongitude());
+        latitude.setText("Latitude: " + mLocation.getLatitude());
+    }
+    
+    //Get the Location by GPS or WIFI
+	public Location getLocation(Context context) {
+		LocationManager locMan = (LocationManager) context
+				.getSystemService(Context.LOCATION_SERVICE);
+		Location location = locMan
+				.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		if (location == null) {
+			location = locMan
+					.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+		}
+		return location;
+	}
+}
+
+3.增加权限，修改AndroidManifest.xml 代码如下（第16行为所增行）：
+
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      package="com.android.tutor"
+      android:versionCode="1"
+      android:versionName="1.0">
+    <application android:icon="@drawable/icon" android:label="@string/app_name">
+        <activity android:name=".LocationDemo"
+                  android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+    <uses-sdk android:minSdkVersion="7" />
+	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+</manifest> 

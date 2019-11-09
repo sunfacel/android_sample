@@ -1,0 +1,28 @@
+
+动态Menu
+
+1、动态菜单就是根据不同的界面有不同的菜单。
+    下面的代码实现这样的功能：当主界面的某个TextView的值是“M“和“N”时，弹出不同的菜单。
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // TODO Auto-generated method stub
+            TextView tv1 = (TextView)findViewById(R.id.textView2);    //获取TextView的内容
+            String currentText = tv1.getText().toString().trim();
+  
+        String currentText = tv1.getText().toString();
+        if("M".equals(currentText)){
+            menu.clear();//先清掉菜单
+            MenuItem item = menu.add(0, 400, 401, "to N");//可以通过点击这个菜单项来改变tv1的值这样(变成N)就可以测试了
+            item.setIcon(android.R.drawable.alert_dark_frame);//android自带的图标
+        }
+        if("N".equals(currentText)){
+            menu.clear();//先清掉菜单
+            MenuItem item = menu.add(0, 401, 402, "to M");//可以通过点击这个菜单项来改变tv1的值这样(变成M)就可以测试了
+            item.setIcon(android.R.drawable.alert_light_frame);
+        }
+        menu.add(0, 402, 403, "Now is " + currentText);//现在共有两个菜单子项
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+
+2、onOptionsItemSelected重写这个函数，响应菜单的点击

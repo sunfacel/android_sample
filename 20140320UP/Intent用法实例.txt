@@ -1,0 +1,137 @@
+Intent用法实例
+
+1.无参数Activity跳转
+
+Intent it = new Intent(Activity.Main.this, Activity2.class);
+startActivity(it);   
+2.向下一个Activity传递数据（使用Bundle和Intent.putExtras）
+
+Intent it = new Intent(Activity.Main.this, Activity2.class);
+Bundle bundle=new Bundle();
+bundle.putString("name", "This is from MainActivity!");
+it.putExtras(bundle);       // it.putExtra(“test”, "shuju”);
+startActivity(it);            // startActivityForResult(it,REQUEST_CODE);
+对于数据的获取可以采用：
+
+Bundle bundle=getIntent().getExtras();
+String name=bundle.getString("name");
+  
+
+3.向上一个Activity返回结果（使用setResult，针对startActivityForResult(it,REQUEST_CODE)启动的Activity）
+
+        Intent intent=getIntent();
+        Bundle bundle2=new Bundle();
+        bundle2.putString("name", "This is from ShowMsg!");
+        intent.putExtras(bundle2);
+        setResult(RESULT_OK, intent);
+4.回调上一个Activity的结果处理函数（onActivityResult）
+
+@Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // TODO Auto-generated method stub
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode==REQUEST_CODE){
+            if(resultCode==RESULT_CANCELED)
+                  setTitle("cancle");
+            else if (resultCode==RESULT_OK) {
+                 String temp=null;
+                 Bundle bundle=data.getExtras();
+                 if(bundle!=null)   temp=bundle.getString("name");
+                 setTitle(temp);
+            }
+        }
+    }
+下面是转载来的其他的一些Intent用法实例（转自javaeye）
+
+显示网页
+   1. Uri uri = Uri.parse("http://google.com");  
+   2. Intent it = new Intent(Intent.ACTION_VIEW, uri);  
+   3. startActivity(it);
+
+显示地图
+   1. Uri uri = Uri.parse("geo:38.899533,-77.036476");  
+   2. Intent it = new Intent(Intent.ACTION_VIEW, uri);   
+   3. startActivity(it);   
+   4. //其他 geo URI 範例  
+   5. //geo:latitude,longitude  
+   6. //geo:latitude,longitude?z=zoom  
+   7. //geo:0,0?q=my+street+address  
+   8. //geo:0,0?q=business+near+city  
+   9. //google.streetview:cbll=lat,lng&cbp=1,yaw,,pitch,zoom&mz=mapZoom
+
+路径规划
+   1. Uri uri = Uri.parse("http://maps.google.com/maps?f=d&saddr=startLat%20startLng&daddr=endLat%20endLng&hl=en");  
+   2. Intent it = new Intent(Intent.ACTION_VIEW, uri);  
+   3. startActivity(it);  
+   4. //where startLat, startLng, endLat, endLng are a long with 6 decimals like: 50.123456 
+
+打电话
+   1. //叫出拨号程序 
+   2. Uri uri = Uri.parse("tel:0800000123");  
+   3. Intent it = new Intent(Intent.ACTION_DIAL, uri);  
+   4. startActivity(it);  
+   1. //直接打电话出去  
+   2. Uri uri = Uri.parse("tel:0800000123");  
+   3. Intent it = new Intent(Intent.ACTION_CALL, uri);  
+   4. startActivity(it);  
+   5. //用這個，要在 AndroidManifest.xml 中，加上  
+   6. //<uses-permission id="android.permission.CALL_PHONE" /> 
+
+传送SMS/MMS
+   1. //调用短信程序 
+   2. Intent it = new Intent(Intent.ACTION_VIEW, uri);  
+   3. it.putExtra("sms_body", "The SMS text");   
+   4. it.setType("vnd.android-dir/mms-sms");  
+   5. startActivity(it); 
+   1. //传送消息 
+   2. Uri uri = Uri.parse("smsto://0800000123");  
+   3. Intent it = new Intent(Intent.ACTION_SENDTO, uri);  
+   4. it.putExtra("sms_body", "The SMS text");  
+   5. startActivity(it); 
+   1. //传送 MMS  
+   2. Uri uri = Uri.parse("content://media/external/images/media/23");  
+   3. Intent it = new Intent(Intent.ACTION_SEND);   
+   4. it.putExtra("sms_body", "some text");   
+   5. it.putExtra(Intent.EXTRA_STREAM, uri);  
+   6. it.setType("image/png");   
+   7. startActivity(it); 
+
+传送 Email
+   1. Uri uri = Uri.parse("mailto:xxx@abc.com");  
+   2. Intent it = new Intent(Intent.ACTION_SENDTO, uri);  
+   3. startActivity(it); 
+
+
+   1. Intent it = new Intent(Intent.ACTION_SEND);  
+   2. it.putExtra(Intent.EXTRA_EMAIL, "me@abc.com");  
+   3. it.putExtra(Intent.EXTRA_TEXT, "The email body text");  
+   4. it.setType("text/plain");  
+   5. startActivity(Intent.createChooser(it, "Choose Email Client")); 
+
+
+   1. Intent it=new Intent(Intent.ACTION_SEND);    
+   2. String[] tos={"me@abc.com"};    
+   3. String[] ccs={"you@abc.com"};    
+   4. it.putExtra(Intent.EXTRA_EMAIL, tos);    
+   5. it.putExtra(Intent.EXTRA_CC, ccs);    
+   6. it.putExtra(Intent.EXTRA_TEXT, "The email body text");    
+   7. it.putExtra(Intent.EXTRA_SUBJECT, "The email subject text");    
+   8. it.setType("message/rfc822");    
+   9. startActivity(Intent.createChooser(it, "Choose Email Client"));
+
+
+   1. //传送附件
+   2. Intent it = new Intent(Intent.ACTION_SEND);  
+   3. it.putExtra(Intent.EXTRA_SUBJECT, "The email subject text");  
+   4. it.putExtra(Intent.EXTRA_STREAM, "file:///sdcard/mysong.mp3");  
+   5. sendIntent.setType("audio/mp3");  
+   6. startActivity(Intent.createChooser(it, "Choose Email Client"));
+
+播放多媒体
+       Uri uri = Uri.parse("file:///sdcard/song.mp3");  
+       Intent it = new Intent(Intent.ACTION_VIEW, uri);  
+       it.setType("audio/mp3");  
+       startActivity(it); 
+       Uri uri = Uri.withAppendedPath(MediaStore.Audio.Media.INTERNAL_CONTENT_URI, "1");  
+       Intent it = new Intent(Intent.ACTION_VIEW, uri);  
+       startActivity(it);

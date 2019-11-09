@@ -1,0 +1,40 @@
+package com.oyah;     
+     
+import android.app.Activity;     
+import android.app.AlertDialog;     
+import android.content.DialogInterface;     
+import android.os.Bundle;     
+     
+public class TestsActivity extends Activity {     
+    public void onCreate(Bundle savedInstanceState) {     
+        super.onCreate(savedInstanceState);     
+        setContentView(R.layout.main);     
+     
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);     
+        alertDialog     
+                .setTitle("title")     
+                .setMessage("message")     
+                .setPositiveButton("okBuuon",     
+                        new DialogInterface.OnClickListener() {     
+     
+                            @Override     
+                            public void onClick(DialogInterface dialog,     
+                                    int which) {     
+     
+                            }     
+                        })     
+                .setNegativeButton("exitButton",     
+                        new DialogInterface.OnClickListener() {     
+     
+                            @Override     
+                            public void onClick(DialogInterface dialog,     
+                                    int which) {     
+     
+                            }     
+                        }).[b]setCancelable(false).[/b]create().show();     
+    }     
+}  
+
+
+针对AlertDialog中设置了确定和取消按钮，一般来说确定为执行某个动作，取消就是不执行，但是如果用户点击了系统的Back键，此时就会将AlertDialog关闭，而并没有执行预期的取消的操作。
+此时需要关注一个方法setCancelable(false) 该方法定义设置该AlertDialog是否可以被Back键取消，如果不设置默认为true  

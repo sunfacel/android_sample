@@ -1,0 +1,37 @@
+1、建立一个Android项目，拷贝这三张图到 res/drawable目录下，这三张图用来表述按钮的三种状态。
+图片名称:
+android_focused
+android_normal
+android_pressed
+2、在res/drawable目录下建立一个android_button.xml文件，其内容如下：
+
+<xml version=”1.0″ encoding=”utf-8”> 
+<selector xmlns:android=”http://schemas.android.com/apk/res/android”> 
+    <item android:state_pressed=”true” android:drawable=”@drawable/android_pressed” /> 
+    <item android:drawable=”@drawable/android_focused” android:state_focused=”true” /> 
+    <item android:drawable=”@drawable/android_normal” /> 
+</selector>
+
+注意，xml中的三个item之间是有严格顺序关系的，只有前两个不为真时才会选择第三个item，如果第三个放在了第一位，那么后面两个定义了也是白定义，你不信可以换一下顺序看看。
+
+3、在main.xml中增加，下面的代码：
+
+1
+<button 
+ android:layout_height="wrap_content" 
+ android:layout_width="wrap_content" 
+ android:id="@+id/button"  
+ android:background="@drawable/android_button" 
+ android:padding="10dp">
+</button>
+4、在Activity的OnCreate()中添加如下代码：
+
+        final Button button = (Button) findViewById(R.id.button); 
+        button.setOnClickListener(new OnClickListener() { 
+            @Override 
+            public void onClick(View v) { 
+                 Toast.makeText(MainCustomButton.this, “哔，哔，哔！”, Toast.LENGTH_SHORT).show(); 
+            } 
+        });
+
+这样点击按钮就会显示”哔，哔，哔！”了。下图是最终运行效果：

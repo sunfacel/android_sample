@@ -1,0 +1,47 @@
+1、jni需要c/c++编译器
+   必备GNUstep Developer Tools，按照顺序 GNUstep System、GNUstep Core、GNUstep Developer 安装即可。
+   GNUStep下载地址http://www.gnustep.org/experience/Windows.html。
+
+2、创建 HelloWorld.m 文件，在指定目录创建文件，如：F:\JNI_Source
+   #import <Foundation/Foundation.h>
+     int main (int argc, const char *argv[]) {
+         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+         NSLog(@"Hello World!");
+         [pool drain];
+         return 0;
+       }
+
+3、用“程序 -> GNUstep -> Shell” 来启动一个模拟 UNIX 控制台，在这下面可以完成开发、编译、执行等工作。
+
+4、转到指定目录：
+   $cd F:\JNI_Source  
+
+5、编译目标码：
+   gcc -fconstant-string-class=NSConstantString -c HelloWorld.m -I /GNUstep/System/Library/Headers
+
+执行上面的命令后，控制台不会有任何输出，这是正确的，否则你需要去检查原因了
+
+6、编译成可执行文件
+   gcc -o HelloWorld HelloWorld.o -L /GNUstep/System/Library/Libraries/ -lobjc -lgnustep-base
+
+7、执行：
+./HelloWorld.exe
+
+输出：
+2011-09-23 13:22:42.828 helloworld[5484] Hello World!
+
+-------------------------------------------------------
+
+1、建立GNUmanefile，使用make
+GNUstep 来说，make 文件名必须是“GNUmakefile”，内容如下：
+
+include $(GNUSTEP_MAKEFILES)/common.make 
+
+TOOL_NAME=HelloWorld<strong>
+</strong>HelloWorld_OBJC_FILES=HelloWorld.m  
+include $(GNUSTEP_MAKEFILES)/tool.make 
+
+HelloWorld 关键字部分为可替换为实际内容。GNUmakefile 文件要求与 .m 文件在同一目录下
+
+
+make 的执行很简单，进入 “GNUmakefile” 所在的目录，在 Shell 窗口中执行 “make” 即可。这会在 “GNUmakefile” 所在目录下生成一个 obj 目录，obj 下包含了可执行文件和目标文件等

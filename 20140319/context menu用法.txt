@@ -1,0 +1,43 @@
+1、Context Menu
+
+　　类似于电脑上的右键，长按某个View（如Button按钮）之后弹出来的菜单。
+    下面例子中，长按定义的按钮（有两个），弹出菜单。点击则不出现菜单
+
+　　首先在activity_main.xml 里定义若干个按钮。
+    <Button
+        android:id="@+id/Button2"     //按钮ID
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/Button1"  //对齐方法
+        android:layout_below="@+id/Button1"     //按钮相对位置
+        android:layout_marginTop="52dp"         //距离边距
+        android:text="@string/button_name1"/>   //按钮名称，值在string里面描述
+
+    再次要注册一下，在onCreate方法里，如下代码：
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+        b1 = (Button) findViewById(R.id.b1);   //在activity_main.xml定义的按钮
+        b2 = (Button) findViewById(R.id.b2);
+        registerForContextMenu(b1);
+        registerForContextMenu(b2);
+    }
+
+
+    然后覆盖onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)方法。 
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,ContextMenuInfo menuInfo) {
+        // TODO Auto-generated method stub
+        if(v==b1){
+            menu.setHeaderTitle("这是1");
+            menu.add(200, 200, 200, "Context Menu 1");
+            menu.add(200, 201, 201, "Context Menu 2");
+        }
+        else if(v==b2){
+            menu.setHeaderTitle("这是2");
+            menu.add(300, 300, 300, "C 1");
+            menu.add(300, 301, 301, "C 2");
+        }
+        super.onCreateContextMenu(menu, v, menuInfo);
+    }    

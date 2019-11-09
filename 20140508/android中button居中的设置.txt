@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:Android=http://schemas.android.com/apk/res/android
+    Android:layout_width="fill_parent"
+    Android:layout_height="fill_parent">
+    <TextView Android:id="@+id/gallerytext"
+        Android:layout_width="fill_parent"
+        Android:layout_height="wrap_content">
+    </TextView>
+    <Gallery Android:id="@+id/gallery"
+        Android:layout_width="fill_parent"
+        Android:layout_height="wrap_content">
+    </Gallery>
+    <Button Android:id="@+id/btngal"
+        Android:layout_width="wrap_content"
+        Android:layout_height="wrap_content"
+        Android:gravity="center_horizontal"
+        Android:textSize="20sp"
+        Android:layout_alignParentBottom="true"
+        Android:layout_centerHorizontal="true"
+        Android:text="返回主界面"/>
+</RelativeLayout>
+简单的说明一下：
+可以看到Button与Gallery对其方式是居中对齐，也即Button与Parent居中对齐。
+另外，
+Android:gravity="CENTER_VERTICAL"：这个是垂直居中对齐
+Android:gravity="BOTTOM":放在容器的底部
+Android:gravity="CENTER":放在容器的中心

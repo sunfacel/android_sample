@@ -1,0 +1,30 @@
+public void getAllMusicFile(String path){
+            File root = new File(path);
+            
+            File[]files = root.listFiles();
+            Log.e("===   files   ===", ""+files);
+            if(files != null){
+                    int len = files.length;
+                    for (int i = 0;i < len; i++){
+//                            HashMap<String, Object> map = new HashMap<String, Object>();
+                            if(files[i].isDirectory()){
+                                    getAllMusicFile(files[i].getPath());
+                            }else{
+                                    String filename = files[i].getName();
+                                    String filepath = files[i].getPath();
+                                    if(filename.toLowerCase().endsWith(".mp3")){
+                                            Log.e("===   filename   ===", ""+filename);
+                                            Log.e("===   filepath   ===", ""+filepath);
+                                            String musicName = filename.substring(0,filename.indexOf("."));
+                                            Log.e("===   musicName   ===",""+musicName);
+                                            mMusicList.add(musicName);
+                                            mFolderList.add(filepath);
+//                                            map.put("MUSICNAME", musicName);
+//                                            map.put("MUSICPATH", filepath);
+//                                            mMusicList.add(map);
+                                    }
+                            }
+                    }
+                    
+                    
+            }

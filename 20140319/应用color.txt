@@ -1,0 +1,19 @@
+
+有下面几种方式来创建或表示一个颜色：
+1、 使用Color类的常量，如：
+    Int color = Color.BULE;  // 创建一个蓝色
+
+2、 如果知道ARGB的取值，那么可以使用Color类的静态方法argb创建一个颜色：
+    Int color = Color.argb(127,255,0,255)；// 半透明的紫色
+
+3、 使用XML资源文件来表示颜色。这是一个扩展性比较好的方式，便于今后可以方便的修改颜色值。
+    <?xml version=”1.0” encoding=”utf-8”>
+	<resources>
+        <color name=”mycolor”>#7fff00ff</color>
+    </resources>
+    定义了一个名为mycolor颜色，在别的地方就可以引用mycolor来获取该颜色值。
+    可以使用ResourceManager类中的getColor来获取该颜色。Java样例代码如下：
+    Int color = getResources().getColor(R.color.mycolor);
+    这与第二种方法得到的值是一样的。
+
+    getResources()方法返回当前活动Activity的ResourceManager类实例。
